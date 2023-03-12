@@ -124,14 +124,14 @@ class CrearReceta(ttk.Frame):
     # FUNCIONES DE PASOS
     def create_method_list(self) -> ttk.Treeview:
         # Numero de columnas y nombres
-        columns = ('Numero', 'Paso')
+        columns = ('Id', 'Paso')
         # Crea el widget
         method_tree = ttk.Treeview(self.parent, columns=columns,
                             show='headings', height=5)
         # Lo ubica en la grilla
         method_tree.grid(row=4, column=1, sticky=(tk.NSEW), padx=5, columnspan=5)
         # Se agregan los encabezados
-        method_tree.heading('Numero', text='Numero')
+        method_tree.heading('Id', text='Id')
         method_tree.heading('Paso', text='Paso')
         
         return method_tree
@@ -141,7 +141,7 @@ class CrearReceta(ttk.Frame):
         with open(METHOD_LIST, newline="\n") as csvfile:
             reader = csv.DictReader(csvfile)
             for method in reader:
-                data = [method["numero"], method["paso"]]
+                data = [method["id"], method["paso"]]
                 self.method_list.insert('', tk.END, values=data)
 
     def new_method(self) -> None:
@@ -149,7 +149,8 @@ class CrearReceta(ttk.Frame):
         AddMethod(toplevel).grid()
 
     def refresh_method_tree(self) -> None:
-        pass
+        self.method_list = self.create_method_list()
+        self.read_method_list()
     
     def save(self) -> None:
         pass
