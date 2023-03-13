@@ -1,15 +1,17 @@
 import tkinter as tk
 from tkinter import ttk
 import csv
-from modules.CreateRecipe import *
+from modules.globalVar import RECIPE_LIST
+from modules.NewRecipe import *
 
 class App(ttk.Frame):
+    '''La clase representa la ventana principal donde el usuario vera las recetas y podra realizar el CRUD'''
     def __init__(self, parent=None) -> None:
         super().__init__(parent, padding=(20))
         self.parent = parent
 
         # MAIN WINDOW
-        parent.geometry('1024x720')
+        parent.geometry('1280x720')
         parent.title('Kitchen App')
         parent.resizable(0, 0)
 
@@ -34,35 +36,45 @@ class App(ttk.Frame):
         
 
 
-    def set_ui(self) -> None:
-        # BUTTONS
+    def set_ui(self) -> ttk.Button:
+        '''Crea los botones y los ubica en la grilla'''
+
+        # BUTTONS - CRUD + REFRESH
+        # CREAR NUEVA RECETA
         ttk.Button(self.parent, text="Nueva", command=self.new_recipe).grid(
             row=0, column=0, padx=10, pady=5, sticky=(tk.NSEW))
-        ttk.Button(self.parent, text="Editar", command=self.new_recipe).grid(
+        # EDITAR RECETA EXISTENTE
+        ttk.Button(self.parent, text="Editar", command=self.preparation).grid(
             row=0, column=1, padx=10, pady=5, sticky=(tk.NSEW))
+        # VER UNA RECETA
         ttk.Button(self.parent, text="Ver", command=self.new_recipe).grid(
             row=0, column=2, padx=10, pady=5, sticky=(tk.NSEW))
+        # ELIMINAR UNA RECETA
         ttk.Button(self.parent, text="Eliminar", command=self.new_recipe).grid(
             row=0, column=3, padx=10, pady=5, sticky=(tk.NSEW))
+        # ACTUALIZAR TREEVIEW
         ttk.Button(self.parent, text="Actualizar", command=self.new_recipe).grid(
             row=0, column=4, padx=10, pady=5, sticky=(tk.NSEW))
 
 
-    def create_tree(self) -> None:
+    def create_tree(self) -> ttk.Treeview:
         '''Crea el treeview widget que contendra las recipes'''
 
-        # Numero de columnas y nombres
-        columns = ('Id', 'Nombre', 'Tiempo de Preparacion')
-        # Crea el widget
+        # NUMERO DE COLUMNAS Y NOMBRES
+        columns = ('Nombre', 'Ingredientes', 'Tiempo de Preparacion', 'Tiempo de Coccion', 'Creado')
+        # CREA EL WIDGET
         tree = ttk.Treeview(self.parent, columns=columns, show='headings')
-        # Lo ubica en la grilla
+        # INSERTARLO EN LA GRILLA
         tree.grid(row=2, column=0, sticky=(tk.NSEW), pady=10, padx=5, columnspan=5)
-        # Se agregan los encabezados
-        tree.heading('Id', text='Id')
+        # INSERTAR EL ENCABEZADO
         tree.heading('Nombre', text='Nombre')
+        tree.heading('Ingredientes', text='Ingredientes')
+        # tree.heading('Preparacion', text='Preparacion')
         tree.heading('Tiempo de Preparacion', text='Tiempo de Preparacion')
+        tree.heading('Tiempo de Coccion', text='Tiempo de Coccion')
+        tree.heading('Creado', text='Creado')
 
-        # Agregar scrollbar
+        # AGREGAR SCROLLBAR
         scrollbar = ttk.Scrollbar(
             self.parent, orient=tk.VERTICAL, command=tree.yview)
         tree.configure(yscroll=scrollbar.set)
@@ -73,17 +85,17 @@ class App(ttk.Frame):
 
     def read_data(self) -> None:
         '''Lee el fichero csv e inserta los datos en el treeview'''
-        with open("csv_files/recipes.csv", newline="\n") as csvfile:
+        with open(RECIPE_LIST, newline="\n") as csvfile:
             reader = csv.DictReader(csvfile)
             for recipe in reader:
-                data = [recipe["id"], recipe["nombre"], recipe["tiempo de preparacion"]]
+                data = [recipe["nombre"], recipe["ingredientes"], recipe["tiempo de preparacion"], recipe["tiempo de coccion"], recipe["creado"]]
                 self.tree.insert('', tk.END, values= data)
 
 
     def new_recipe(self) -> None:
         '''Abre una nueva ventana para agregar una receta'''
         toplevel = tk.Toplevel(self.parent)
-        CrearReceta(toplevel, 'Agregar Receta').grid()
+        NewRecipe(toplevel, 'Agregar Receta').grid()
 
 
 root = tk.Tk()

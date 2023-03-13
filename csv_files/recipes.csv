@@ -1,3 +1,2 @@
-id,nombre,tiempo de preparacion
-1,pizza,120
-2,papas fritas,60
+id,nombre,ingredientes,cantidades,preparacion,tiempo de preparacion,tiempo de coccion,creado
+1,Pizza,"sal,harina 00,aceite,agua tibia","200 gramos,1 kilogramos,2 cucharadas,2 unidades","Mezclar el agua con la levadura en un recipiente,Agregar las dos cucharadas de aceite,Anadir en un bol amplio la harina y la sal, vertir la mezcla anterior.,Empezar a amasar,Una vez que puedas manejarla sin problema divide en 4 y reposar 45 min,Espolvorear harina sobre la mesa y extender con las manos,Agregar salsa y toppings y hornear",60 min,15 min,22:53 12-03-2023

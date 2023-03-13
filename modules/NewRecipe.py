@@ -1,13 +1,10 @@
-import tkinter as tk
-from tkinter import ttk
-import csv
 from modules.AddIngredient import *
 from modules.AddMethod import *
+from modules.globalVar import METHOD_LIST, INGREDIENT_LIST, RECIPE_LIST
+from modules.Ingredient import Ingredient
+from modules.Recipe import Recipe
 
-METHOD_LIST = "./csv_files/method_list_temp.csv"
-INGREDIENT_LIST = "./csv_files/ingredients_temp.csv"
-
-class CrearReceta(ttk.Frame):
+class NewRecipe(ttk.Frame):
     def __init__(self, parent, title: str) -> None:
         super().__init__(parent, padding=(20))
         self.parent = parent
@@ -123,6 +120,7 @@ class CrearReceta(ttk.Frame):
 
     # FUNCIONES DE PASOS
     def create_method_list(self) -> ttk.Treeview:
+        '''Crea el treeview widget que contendra los pasos de preparacion'''
         # Numero de columnas y nombres
         columns = ('Id', 'Paso')
         # Crea el widget
@@ -145,12 +143,88 @@ class CrearReceta(ttk.Frame):
                 self.method_list.insert('', tk.END, values=data)
 
     def new_method(self) -> None:
+        '''Crea una ventana para agregar un paso a la lista de preparacion'''
         toplevel = tk.Toplevel(self.parent)
         AddMethod(toplevel).grid()
 
     def refresh_method_tree(self) -> None:
+        '''Actualiza la lista de pasos de preparacion'''
         self.method_list = self.create_method_list()
         self.read_method_list()
     
+    def get_last_recipe_id(self) -> int:
+        '''Obtiene el id del ultimo item de la lista de recetas y lo regresa, si no existe devuelve 0'''
+        with open(RECIPE_LIST, 'r') as csvfile:
+            reader = csvfile.readlines()
+            last_id = reader[-1].split(',')[0]
+        if last_id == 'id':
+            return 0
+        else:
+            return int(last_id)
+    
+    def get_recipe_ingredients(self) -> list[Ingredient]:
+        '''Lee el fichero de ingredientes y los convierte en objetos Ingredientes. Devuelve una lista de objetos.'''
+        f_ingredients = []
+        with open(INGREDIENT_LIST, newline="\n") as csvfile:
+            reader = csv.DictReader(csvfile)
+            for ingredient in reader:
+                new_ingredient = Ingredient(
+                    ingredient['nombre'], 
+                    ingredient['cantidad'], 
+                    ingredient['medida']
+                )
+                f_ingredients.append(new_ingredient)
+        self.reset_file(INGREDIENT_LIST, ["nombre", "cantidad", "medida"])
+        return f_ingredients
+    
+    def get_recipe_methods(self) -> list:
+        '''Lee la lista de pasos de preparacion y lo formatea para agregar a la receta'''
+        f_methods = []
+        with open(METHOD_LIST, newline="\n") as csvfile:
+            reader = csv.DictReader(csvfile)
+            for prep_method in reader:
+                f_methods.append(prep_method['paso'])
+        self.reset_file(METHOD_LIST, ["id", "paso"])
+        return f_methods
+    
+    def get_recipe(self) -> dict[str]:
+        '''Toma los valores ingresados y los convierte en un objeto Receta, regresa los datos formateados en un diccionario de strings'''
+        new_recipe = Recipe(
+            id = self.get_last_recipe_id() + 1,
+            name = self.name.get(), 
+            ingredients = self.get_recipe_ingredients(),
+            preparation = self.get_recipe_methods(),
+            preparation_time = self.preparation_time.get(),
+            cooking_time = self.cooking_time.get()
+        )
+        return new_recipe.format_values()
+    
+    def reset_file(self, route: str, fieldlist: list[str]) -> None:
+        '''Elimina los items de las lista temporales dejando solo los encabezados.
+            params:
+                (str) route: la ruta del csv a resetear
+                (list) fieldlist: los encabezados del fichero
+        '''
+        with open(route, "w", newline="\n") as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=fieldlist)
+            writer.writeheader()
+    
     def save(self) -> None:
-        pass
+        '''Toma los datos ingresados en la ventana y los almacena en csv_files'''
+        new_recipe = self.get_recipe()
+        fields = ['id', 'nombre', 'ingredientes', 'cantidades', 'preparacion', 'tiempo de preparacion', 'tiempo de coccion', 'creado']
+        with open(RECIPE_LIST, 'a') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=fields)
+            writer.writerow(
+                {
+                    'id': new_recipe['id'],
+                    'nombre': new_recipe['nombre'],
+                    'ingredientes': new_recipe['ingredientes'],
+                    'cantidades': new_recipe['cantidades'],
+                    'preparacion': new_recipe['preparacion'],
+                    'tiempo de preparacion': new_recipe['tiempo de preparacion'],
+                    'tiempo de coccion': new_recipe['tiempo de coccion'],
+                    'creado': new_recipe['creado']
+                }
+            )
+        self.parent.destroy()
