@@ -15,7 +15,7 @@ class Recipe():
             (int) cooking_time: tiempo de coccion en minutos
             (datetime) created_at: fecha y hora de creacion
     '''
-    # PENDIENTE etiquetas: list, favorita: bool = False, imagen: str = None
+    # PENDIENTE etiquetas: list, favorita: bool = False
     def __init__(self, id: int, name: str, ingredients: list[Ingredient], preparation: list[str], preparation_time: int, cooking_time: int, created_at = datetime.now(), image: str = None) -> None:
         self.id = id
         self.name = name

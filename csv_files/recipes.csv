@@ -1,3 +1,2 @@
 id,nombre,ingredientes,cantidades,preparacion,tiempo de preparacion,tiempo de coccion,creado,imagen
 1,Pizza,"sal,harina 00,aceite,agua tibia","200 gramos,1 kilogramos,2 cucharadas,2 unidades","Mezclar el agua con la levadura en un recipiente,Agregar las dos cucharadas de aceite,Anadir en un bol amplio la harina y la sal, vertir la mezcla anterior.,Empezar a amasar,Una vez que puedas manejarla sin problema divide en 4 y reposar 45 min,Espolvorear harina sobre la mesa y extender con las manos,Agregar salsa y toppings y hornear",60 min,15 min,22:53 12-03-2023,None
-2,prueba,"ig_test,test_ig2","1 cucharadas,4 cucharadas","testing 1,testing 2",20 min,60 min,20:58 13-03-2023,None
