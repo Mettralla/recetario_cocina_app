@@ -21,7 +21,7 @@ class AddIngrediente(ttk.Frame):
         self.medida = tk.StringVar()
         # OPCIONES DE MEDIDA
         self.medidas = ['miligramos', 'gramos', 'kilogramos',
-                        'cucharadas', 'cucharaditas', 'unidades']
+                        'cucharadas', 'cucharaditas', 'unidades', 'taza']
 
         # GRID
 

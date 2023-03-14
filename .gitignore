@@ -39,3 +39,4 @@ dmypy.json
 
 #others
 examples/
+test/

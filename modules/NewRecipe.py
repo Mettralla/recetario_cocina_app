@@ -3,11 +3,14 @@ from modules.AddMethod import *
 from modules.globalVar import METHOD_LIST, INGREDIENT_LIST, RECIPE_LIST
 from modules.Ingredient import Ingredient
 from modules.Recipe import Recipe
+from tkinter import filedialog as fd
+from tkinter import messagebox as msg
 
 class NewRecipe(ttk.Frame):
     def __init__(self, parent, title: str) -> None:
         super().__init__(parent, padding=(20))
         self.parent = parent
+        self.image = None
 
         parent.title(title)
         parent.geometry('580x650')
@@ -28,9 +31,10 @@ class NewRecipe(ttk.Frame):
         parent.rowconfigure(2, weight=2)  # Ingred list
         parent.rowconfigure(3, weight=1)  # Prep
         parent.rowconfigure(4, weight=2)  # Prep list
-        parent.rowconfigure(5, weight=2)  # Time prep
-        parent.rowconfigure(6, weight=2)  # time cocc
-        parent.rowconfigure(7, weight=1)  # buttons
+        parent.rowconfigure(5, weight=1)  # Time prep
+        parent.rowconfigure(6, weight=1)  # time cocc
+        parent.rowconfigure(7, weight=1)  # time cocc
+        parent.rowconfigure(8, weight=1)  # buttons
 
         self.create_ui()
 
@@ -70,19 +74,27 @@ class NewRecipe(ttk.Frame):
         
         # TIEMPO DE PREPARACION
         ttk.Label(self.parent, text="Tiempo de Preparacion:", padding=3).grid(
-            row=5, column=1, sticky=tk.EW)
+            row=5, column=1, columnspan=3, sticky=tk.EW)
         ttk.Entry(self.parent, textvariable=self.preparation_time, justify= tk.RIGHT).grid(
             row=5, column=2, columnspan=4, sticky=tk.EW)
         
         # TIEMPO DE COCCION
         ttk.Label(self.parent, text="Tiempo de Cocción:", padding=3).grid(
-            row=6, column=1, sticky=tk.EW)
+            row=6, column=1, columnspan=3,sticky=tk.EW)
         ttk.Entry(self.parent, textvariable=self.cooking_time, justify= tk.RIGHT).grid(
             row=6, column=2, columnspan=4, sticky=tk.EW)
-
+        
+        # IMAGEN
+        ttk.Label(self.parent, text="Imagen:", padding=3).grid(
+            row=7, column=1, columnspan=1, sticky=tk.EW)
+        # ttk.Entry(self.parent).grid(
+        #     row=7, column=2, columnspan=3, sticky=tk.EW)
+        ttk.Button(self.parent, text="Agregar", command=self.add_image).grid(
+            row=7, column=2, columnspan=4, sticky=tk.EW)
+        
         # BOTONERA
-        ttk.Button(self.parent, text="Crear", command=self.save).grid(row=7, column=1, columnspan=2, sticky=tk.NSEW, padx=5, pady=5)
-        ttk.Button(self.parent, text="Cancelar", command=self.parent.destroy).grid(row=7, column=3, columnspan=3, sticky=tk.NSEW, padx=5, pady=5)
+        ttk.Button(self.parent, text="Crear", command=self.save).grid(row=8, column=1, columnspan=2, sticky=tk.NSEW, padx=5, pady=5)
+        ttk.Button(self.parent, text="Cancelar", command=self.parent.destroy).grid(row=8, column=3, columnspan=3, sticky=tk.NSEW, padx=5, pady=5)
 
     # FUNCIONES DE INGREDIENTE
     def create_ingredient_list(self) -> ttk.Treeview:
@@ -154,13 +166,19 @@ class NewRecipe(ttk.Frame):
     
     def get_last_recipe_id(self) -> int:
         '''Obtiene el id del ultimo item de la lista de recetas y lo regresa, si no existe devuelve 0'''
-        with open(RECIPE_LIST, 'r') as csvfile:
-            reader = csvfile.readlines()
-            last_id = reader[-1].split(',')[0]
-        if last_id == 'id':
-            return 0
-        else:
-            return int(last_id)
+        with open(RECIPE_LIST, newline="\n") as csvfile:
+            last_id = 0
+            reader = csv.DictReader(csvfile)
+            for recipe in reader:
+                if recipe['id'] != 'id' or recipe['id'] != '\n':
+                    id = int(recipe['id'])
+                    last_id = id
+                else:
+                    pass
+            if last_id != 0:
+                return last_id
+            else:
+                return 0
     
     def get_recipe_ingredients(self) -> list[Ingredient]:
         '''Lee el fichero de ingredientes y los convierte en objetos Ingredientes. Devuelve una lista de objetos.'''
@@ -195,7 +213,8 @@ class NewRecipe(ttk.Frame):
             ingredients = self.get_recipe_ingredients(),
             preparation = self.get_recipe_methods(),
             preparation_time = self.preparation_time.get(),
-            cooking_time = self.cooking_time.get()
+            cooking_time = self.cooking_time.get(),
+            image = self.image
         )
         return new_recipe.format_values()
     
@@ -208,11 +227,29 @@ class NewRecipe(ttk.Frame):
         with open(route, "w", newline="\n") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldlist)
             writer.writeheader()
-    
+            
+    def add_image(self):
+        '''Guarda la direccion de la imagen a guardar'''
+        self.image = fd.askopenfilename(
+            filetypes=(
+                ('jpg files', '*.jpg'), ('All files', '*.*')
+            )
+        )
+        if self.image != None:
+            msg.showinfo(
+                message='Imagen agregada con exito',
+                title='Agregar imagen'
+            )
+        else:
+            msg.showinfo(
+                message='Imagen no guardada', 
+                title='Agregar imagen'
+        )
+
     def save(self) -> None:
         '''Toma los datos ingresados en la ventana y los almacena en csv_files'''
         new_recipe = self.get_recipe()
-        fields = ['id', 'nombre', 'ingredientes', 'cantidades', 'preparacion', 'tiempo de preparacion', 'tiempo de coccion', 'creado']
+        fields = ['id', 'nombre', 'ingredientes', 'cantidades', 'preparacion', 'tiempo de preparacion', 'tiempo de coccion', 'creado', 'imagen']
         with open(RECIPE_LIST, 'a') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fields)
             writer.writerow(
@@ -224,7 +261,8 @@ class NewRecipe(ttk.Frame):
                     'preparacion': new_recipe['preparacion'],
                     'tiempo de preparacion': new_recipe['tiempo de preparacion'],
                     'tiempo de coccion': new_recipe['tiempo de coccion'],
-                    'creado': new_recipe['creado']
+                    'creado': new_recipe['creado'],
+                    'imagen': new_recipe['imagen']
                 }
             )
         self.parent.destroy()

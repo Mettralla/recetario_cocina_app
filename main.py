@@ -44,7 +44,7 @@ class App(ttk.Frame):
         ttk.Button(self.parent, text="Nueva", command=self.new_recipe).grid(
             row=0, column=0, padx=10, pady=5, sticky=(tk.NSEW))
         # EDITAR RECETA EXISTENTE
-        ttk.Button(self.parent, text="Editar", command=self.preparation).grid(
+        ttk.Button(self.parent, text="Editar", command=self.new_recipe).grid(
             row=0, column=1, padx=10, pady=5, sticky=(tk.NSEW))
         # VER UNA RECETA
         ttk.Button(self.parent, text="Ver", command=self.new_recipe).grid(
@@ -53,7 +53,7 @@ class App(ttk.Frame):
         ttk.Button(self.parent, text="Eliminar", command=self.new_recipe).grid(
             row=0, column=3, padx=10, pady=5, sticky=(tk.NSEW))
         # ACTUALIZAR TREEVIEW
-        ttk.Button(self.parent, text="Actualizar", command=self.new_recipe).grid(
+        ttk.Button(self.parent, text="Actualizar", command=self.refresh_recipe_tree).grid(
             row=0, column=4, padx=10, pady=5, sticky=(tk.NSEW))
 
 
@@ -91,11 +91,16 @@ class App(ttk.Frame):
                 data = [recipe["nombre"], recipe["ingredientes"], recipe["tiempo de preparacion"], recipe["tiempo de coccion"], recipe["creado"]]
                 self.tree.insert('', tk.END, values= data)
 
-
+    #CRUD
     def new_recipe(self) -> None:
         '''Abre una nueva ventana para agregar una receta'''
         toplevel = tk.Toplevel(self.parent)
         NewRecipe(toplevel, 'Agregar Receta').grid()
+        
+    def refresh_recipe_tree(self) -> None:
+        '''Actualiza la lista de recetas'''
+        self.tree = self.create_tree()
+        self.read_data()
 
 
 root = tk.Tk()
