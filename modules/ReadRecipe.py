@@ -39,6 +39,7 @@ class ReadRecipe(ttk.Frame):
 
 
     def get_recipe(self) -> dict:
+        '''Lee el fichero, identifica la receta a traves del id y la convierte en un diccionario lista para ser mostrada'''
         selected_recipe = {}
         with open(RECIPE_LIST, "r", newline="\n") as csvfile:
             reader = csv.reader(csvfile)
@@ -133,6 +134,7 @@ class ReadRecipe(ttk.Frame):
         return method_tree
     
     def load_method_list(self) -> None:
+        '''Carga los pasos de preparacion en la lista'''
         prep_methods = self.recipe['preparacion'].split(',')
         # print(prep_methods)
         for index, prep_method in enumerate(prep_methods, 1):
