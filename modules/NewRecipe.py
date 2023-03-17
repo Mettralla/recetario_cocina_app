@@ -47,14 +47,15 @@ class NewRecipe(ttk.Frame):
         # NOMBRE DE LA RECETA
         ttk.Label(self.parent, text="Nombre:", padding=3).grid(
             row=0, column=1, sticky=tk.EW)
-        ttk.Entry(self.parent, textvariable=self.name).grid(
+        ttk.Entry(self.parent, textvariable=self.name, justify=tk.RIGHT).grid(
             row=0, column=2, columnspan=4, sticky=tk.EW)
 
         # INGREDIENTES DE LA RECETA
         ttk.Label(self.parent, text="Ingredientes:", padding=3).grid(
             row=1, column=1, sticky=tk.EW)
         ttk.Button(self.parent, text="Agregar Ingrediente", command=self.new_ingredient).grid(
-            row=1, column=2, columnspan=3, sticky=tk.EW, padx=5)
+            row=1, column=2, columnspan=2, sticky=tk.EW, padx=5)
+        ttk.Button(self.parent, text="Eliminar Ingrediente", command=self.delete_ingredient).grid(row=1, column=4, sticky=tk.EW, padx=5)
         ttk.Button(self.parent, text="Actualizar", command=self.refresh_ingredient_tree).grid(
             row=1, column=5, sticky=tk.EW, padx=5)
         # LISTA DE INGREDIENTES
@@ -62,10 +63,12 @@ class NewRecipe(ttk.Frame):
         self.read_ingredient_list()
         
         # PASOS DE LA RECETA
-        ttk.Label(self.parent, text="Nombre:", padding=3).grid(
+        ttk.Label(self.parent, text="Preparacion:", padding=3).grid(
             row=3, column=1, sticky=tk.EW)
         ttk.Button(self.parent, text="Agregar Paso", command=self.new_method).grid(
-            row=3, column=2, columnspan=3, sticky=tk.EW, padx=5)
+            row=3, column=2, columnspan=2, sticky=tk.EW, padx=5)
+        ttk.Button(self.parent, text="Eliminar Paso", command=self.delete_method).grid(
+            row=3, column=4, sticky=tk.EW, padx=5)
         ttk.Button(self.parent, text="Actualizar", command=self.refresh_method_tree).grid(
             row=3, column=5, sticky=tk.EW, padx=5)
         # LISTA DE INGREDIENTES
@@ -76,13 +79,13 @@ class NewRecipe(ttk.Frame):
         ttk.Label(self.parent, text="Tiempo de Preparacion:", padding=3).grid(
             row=5, column=1, columnspan=3, sticky=tk.EW)
         ttk.Entry(self.parent, textvariable=self.preparation_time, justify= tk.RIGHT).grid(
-            row=5, column=2, columnspan=4, sticky=tk.EW)
+            row=5, column=3, columnspan=3, sticky=tk.EW)
         
         # TIEMPO DE COCCION
         ttk.Label(self.parent, text="Tiempo de Cocción:", padding=3).grid(
             row=6, column=1, columnspan=3,sticky=tk.EW)
         ttk.Entry(self.parent, textvariable=self.cooking_time, justify= tk.RIGHT).grid(
-            row=6, column=2, columnspan=4, sticky=tk.EW)
+            row=6, column=3, columnspan=3, sticky=tk.EW)
         
         # IMAGEN
         ttk.Label(self.parent, text="Imagen:", padding=3).grid(
@@ -90,7 +93,7 @@ class NewRecipe(ttk.Frame):
         # ttk.Entry(self.parent).grid(
         #     row=7, column=2, columnspan=3, sticky=tk.EW)
         ttk.Button(self.parent, text="Agregar", command=self.add_image).grid(
-            row=7, column=2, columnspan=4, sticky=tk.EW)
+            row=7, column=3, columnspan=3, sticky=tk.EW)
         
         # BOTONERA
         ttk.Button(self.parent, text="Crear", command=self.save).grid(row=8, column=1, columnspan=2, sticky=tk.NSEW, padx=5, pady=5)
@@ -245,6 +248,62 @@ class NewRecipe(ttk.Frame):
                 message='Imagen no guardada', 
                 title='Agregar imagen'
         )
+            
+    def delete_method(self):
+        '''Borra el ultimo paso de preparacion de la lista'''
+        try:
+            method_list = []
+            fields = ["id", "paso"]
+            with open(METHOD_LIST,  "r", newline="\n") as csvfile:
+                reader = csv.reader(csvfile)
+                for prep_method in reader:
+                    if prep_method[0] == "id":
+                        pass
+                    else:
+                        method_list.append(prep_method)
+            method_list.pop()
+            with open(METHOD_LIST, "w", newline="\n") as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=fields)
+                writer.writeheader()
+                for prep_method in method_list:
+                    writer.writerow(
+                        {
+                            'id': prep_method[0],
+                            'paso': prep_method[1]
+                        }
+                    )
+            self.refresh_method_tree()
+        except IndexError:
+            msg.showerror(message='No hay ningun paso en la lista', title='Eliminar paso de preparacion')
+    
+    def delete_ingredient(self):
+        '''Borra el ultimo ingrediente de la lista'''
+        try:
+            ingredient_list = []
+            fields = ["nombre", "cantidad", "medida"]
+            with open(INGREDIENT_LIST,  "r", newline="\n") as csvfile:
+                reader = csv.reader(csvfile)
+                for ingredient in reader:
+                    if ingredient[0] == "nombre":
+                        pass
+                    else:
+                        ingredient_list.append(ingredient)
+            ingredient_list.pop()
+            with open(INGREDIENT_LIST, "w", newline="\n") as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=fields)
+                writer.writeheader()
+                for ingredient in ingredient_list:
+                    writer.writerow(
+                        {
+                            'nombre': ingredient[0],
+                            'cantidad': ingredient[1],
+                            'medida': ingredient[2]
+                        }
+                    )
+            self.refresh_ingredient_tree()
+        except IndexError:
+            msg.showerror(message='No hay ningun ingrediente en la lista',
+                          title='Eliminar ingrediente')
 
     def save(self) -> None:
         '''Toma los datos ingresados en la ventana y los almacena en csv_files'''

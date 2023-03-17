@@ -139,8 +139,7 @@ class App(ttk.Frame):
                     )
             msg.showinfo(message='Receta eliminada con exito, actualice la lista', title='Eliminar Receta')
         except IndexError:
-            msg.showerror(
-                message='No ha seleccionado ningun item, haga click sobre un item y presione el boton.', title='Eliminar Receta')
+            msg.showerror(message='No ha seleccionado ningun item, haga click sobre un item y presione el boton.', title='Eliminar Receta')
     
     def read_recipe(self) -> None:
         pass
