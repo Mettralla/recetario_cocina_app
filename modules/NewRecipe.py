@@ -230,8 +230,8 @@ class NewRecipe(ttk.Frame):
         with open(route, "w", newline="\n") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldlist)
             writer.writeheader()
-            
-    def add_image(self):
+
+    def add_image(self) -> None:
         '''Guarda la direccion de la imagen a guardar'''
         self.image = fd.askopenfilename(
             filetypes=(
@@ -248,8 +248,8 @@ class NewRecipe(ttk.Frame):
                 message='Imagen no guardada', 
                 title='Agregar imagen'
         )
-            
-    def delete_method(self):
+
+    def delete_method(self) -> None:
         '''Borra el ultimo paso de preparacion de la lista'''
         try:
             method_list = []
@@ -275,8 +275,8 @@ class NewRecipe(ttk.Frame):
             self.refresh_method_tree()
         except IndexError:
             msg.showerror(message='No hay ningun paso en la lista', title='Eliminar paso de preparacion')
-    
-    def delete_ingredient(self):
+
+    def delete_ingredient(self) -> None:
         '''Borra el ultimo ingrediente de la lista'''
         try:
             ingredient_list = []

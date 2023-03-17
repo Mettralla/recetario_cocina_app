@@ -3,6 +3,7 @@ from tkinter import ttk
 import csv
 from modules.globalVar import RECIPE_LIST
 from modules.NewRecipe import *
+from modules.ReadRecipe import ReadRecipe
 
 class App(ttk.Frame):
     '''La clase representa la ventana principal donde el usuario vera las recetas y podra realizar el CRUD'''
@@ -142,14 +143,21 @@ class App(ttk.Frame):
             msg.showerror(message='No ha seleccionado ningun item, haga click sobre un item y presione el boton.', title='Eliminar Receta')
     
     def read_recipe(self) -> None:
-        pass
+        '''Abre una nueva ventana para leer una receta'''
+        try: 
+            id = self.get_recipe_id()
+            toplevel = tk.Toplevel(self.parent)
+            ReadRecipe(toplevel, 'Leer Receta', id).grid()
+        except IndexError:
+            msg.showerror(
+                message='No ha seleccionado ningun item, haga click sobre un item y presione el boton.', title='Ver Receta')
         
     def refresh_recipe_tree(self) -> None:
         '''Actualiza la lista de recetas'''
         self.tree = self.create_tree()
         self.read_data()
 
-    def get_recipe_id(self) -> str:
+    def get_recipe_id(self) -> int:
         '''Guarda el id del item seleccionado al presionar un boton'''
         select_item = self.tree.focus()
         return self.tree.item(select_item)['values'][0]
