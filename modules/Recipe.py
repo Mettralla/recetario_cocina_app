@@ -74,7 +74,7 @@ class Recipe():
             if self.image != None:
                 shutil.copy(self.image, DESTINATION)
                 img_name = self.image.split('/')[-1]
-                return repr("images\\" + img_name)
+                return "images\\" + img_name # CORREGIR FORMATO
             else:
                 return 'None'
         except:

@@ -3,6 +3,7 @@ from tkinter import ttk
 import csv
 from modules.globalVar import METHOD_LIST, INGREDIENT_LIST, RECIPE_LIST
 from tkinter import messagebox as msg
+from PIL import ImageTk, Image
 
 class ReadRecipe(ttk.Frame):
     def __init__(self, parent, title: str, recipe_id: str) -> None:
@@ -35,7 +36,7 @@ class ReadRecipe(ttk.Frame):
         # parent.rowconfigure(7, weight=1)  # time cocc
         # parent.rowconfigure(8, weight=1)  # buttons
         
-        self.create_ui_without_image()
+        self.create_ui()
 
 
     def get_recipe(self) -> dict:
@@ -63,11 +64,17 @@ class ReadRecipe(ttk.Frame):
                         pass
         return selected_recipe
     
-    def create_ui_without_image(self) -> None:
+    def create_ui(self) -> None:
         '''Muestra la receta'''
         # TITULO
-        ttk.Label(self.parent, text=self.recipe['nombre'], padding=3, font=('Arial', 25)).grid(
-            row=0, column=1, sticky=tk.EW)
+        ttk.Label(self.parent, text=self.recipe['nombre'], font=('Arial', 25)).grid(row=0, column=1, sticky=tk.EW)
+        
+        # IMAGEN
+        if self.recipe['imagen'] != 'None':
+            self.img = ImageTk.PhotoImage(
+                Image.open(self.recipe['imagen']).resize((100, 100)))
+            ttk.Label(self.parent, image=self.img).grid(
+                row=0, column=5)
         
         # LISTA DE INGREDIENTES
         ttk.Label(self.parent, text="Ingredientes:", padding=3).grid(
