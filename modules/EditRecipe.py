@@ -19,7 +19,6 @@ class EditRecipe(ttk.Frame):
         self.name = tk.StringVar()
         self.preparation_time = tk.StringVar()
         self.cooking_time = tk.StringVar()
-        self.image = None
 
         parent.title(title)
         parent.geometry('580x650')
@@ -133,9 +132,11 @@ class EditRecipe(ttk.Frame):
             row=8, column=3, columnspan=3, sticky=tk.NSEW, padx=5, pady=5)
 
     def set_variables(self):
+        '''Rellena automaticamente los entry con los valores actuales'''
         self.name.set(self.recipe['nombre'])
         self.preparation_time.set(self.recipe['tiempo de preparacion'])
         self.cooking_time.set(self.recipe['tiempo de coccion'])
+
     #   INGREDIENTES
     def create_ingredient_list(self) -> ttk.Treeview:
         '''Crea el treeview widget que contendra los ingredientes'''
@@ -194,6 +195,7 @@ class EditRecipe(ttk.Frame):
             msg.showerror(message='No realizo ningun cambio', title='Error al actualizar')
 
     def delete_ingredient(self) -> None:
+        '''Elimina el ultimo ingrediente de la lista de ingredientes'''
         try:
             ingredients = self.recipe['ingredientes'].split(',')
             amounts = self.recipe['cantidades'].split(',')
@@ -252,6 +254,7 @@ class EditRecipe(ttk.Frame):
             )
 
     def new_method(self) -> None:
+        '''Abre una ventana para agregar paso de preparacion'''
         toplevel = tk.Toplevel(self.parent)
         AddMethod(toplevel).grid()
         
@@ -277,6 +280,7 @@ class EditRecipe(ttk.Frame):
                           title='Error al actualizar')
 
     def delete_method(self) -> None:
+        '''Elimina el ultimo elemento de la lista de preparacion'''
         try:
             prep = self.recipe['preparacion'].split(',')
             prep.pop(-1)
@@ -307,7 +311,6 @@ class EditRecipe(ttk.Frame):
     
     def save(self) -> None:
         '''Toma los datos ingresados en la ventana y los almacena en csv_files'''
-        new_recipe = self.get_recipe()
         recipes = []
         with open(RECIPE_LIST, "r", newline="\n") as csvfile:
             reader = csv.reader(csvfile)
