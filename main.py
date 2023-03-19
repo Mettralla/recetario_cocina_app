@@ -4,6 +4,7 @@ import csv
 from modules.globalVar import RECIPE_LIST
 from modules.NewRecipe import *
 from modules.ReadRecipe import ReadRecipe
+from modules.EditRecipe import EditRecipe
 
 class App(ttk.Frame):
     '''La clase representa la ventana principal donde el usuario vera las recetas y podra realizar el CRUD'''
@@ -102,8 +103,9 @@ class App(ttk.Frame):
     def edit_recipe(self) -> None:
         '''Abre una ventana para agregar una receta'''
         try:
-            select_item = self.get_recipe_id()
-            print(self.tree.item(select_item)['values'][0])
+            id = self.get_recipe_id()
+            toplevel = tk.Toplevel(self.parent)
+            EditRecipe(toplevel, 'Editar Receta', id).grid()
         except IndexError:
             msg.showerror(message='No ha seleccionado ningun item, haga click sobre un item y presione el boton.', title='Editar Receta')
         

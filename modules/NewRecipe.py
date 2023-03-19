@@ -126,7 +126,7 @@ class NewRecipe(ttk.Frame):
     def new_ingredient(self) -> None: 
         '''Abre una ventana para agregar un ingrediente'''
         toplevel = tk.Toplevel(self.parent)
-        AddIngrediente(toplevel).grid()
+        AddIngredient(toplevel).grid()
 
     def refresh_ingredient_tree(self) -> None:
         '''Actualiza la lista de ingredientes'''

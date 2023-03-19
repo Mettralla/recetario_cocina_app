@@ -3,7 +3,7 @@ from tkinter import ttk
 import csv
 from modules.globalVar import INGREDIENT_LIST
 
-class AddIngrediente(ttk.Frame):
+class AddIngredient(ttk.Frame):
     '''Clase que representa la ventana de agregar ingrediente individual'''
     def __init__(self, parent) -> None:
         super().__init__(parent, padding=(20))
@@ -71,4 +71,5 @@ class AddIngrediente(ttk.Frame):
                     "nombre": new_ingredient['nombre'], "cantidad": new_ingredient['cantidad'], "medida": new_ingredient['medida']
                 }
             )
+        
         self.parent.destroy()
