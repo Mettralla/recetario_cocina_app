@@ -1,12 +1,13 @@
 from modules.AddIngredient import *
 from modules.AddMethod import *
-from modules.globalVar import METHOD_LIST, INGREDIENT_LIST, RECIPE_LIST
+from modules.globalVar import METHOD_LIST, INGREDIENT_LIST, RECIPE_LIST, DESTINATION
 from modules.Ingredient import Ingredient
-from modules.Recipe import Recipe
 import csv
 from tkinter import filedialog as fd
 from tkinter import messagebox as msg
 import itertools
+import shutil
+import os
 
 
 class EditRecipe(ttk.Frame):
@@ -123,7 +124,9 @@ class EditRecipe(ttk.Frame):
         ttk.Label(self.parent, text="Imagen:", padding=3).grid(
             row=7, column=1, columnspan=1, sticky=tk.EW)
         ttk.Button(self.parent, text="Agregar", command=self.add_image).grid(
-            row=7, column=3, columnspan=3, sticky=tk.EW)
+            row=7, column=3, columnspan=2, sticky=tk.EW)
+        ttk.Button(self.parent, text="Borrar", command=self.delete_image).grid(
+            row=7, column=5, sticky=tk.EW)
 
         # # BOTONERA
         ttk.Button(self.parent, text="Guardar Cambios", command=self.save).grid(
@@ -293,12 +296,15 @@ class EditRecipe(ttk.Frame):
 
     def add_image(self) -> None:
         '''Guarda la direccion de la imagen a guardar'''
-        self.recipe['imagen'] = fd.askopenfilename(
+        self.image = fd.askopenfilename(
             filetypes=(
                 ('jpg files', '*.jpg'), ('All files', '*.*')
             )
         )
         if self.image != None:
+            shutil.copy(self.image, DESTINATION)
+            img_name = self.image.split('/')[-1]
+            self.recipe['imagen'] = "images\\" + img_name  # CORREGIR FORMATO
             msg.showinfo(
                 message='Imagen agregada con exito',
                 title='Agregar imagen'
@@ -308,6 +314,14 @@ class EditRecipe(ttk.Frame):
                 message='Imagen no guardada',
                 title='Agregar imagen'
             )
+            
+    def delete_image(self) -> None:
+        if self.recipe['imagen'] == 'None':
+            msg.showinfo(title='Borrar imagen', message='Esta receta no tiene imagen')
+        else:
+            os.remove(self.recipe['imagen'])
+            self.recipe['imagen'] = 'None'
+            msg.showinfo(title='Borrar imagen', message='Imagen borrada')
     
     def save(self) -> None:
         '''Toma los datos ingresados en la ventana y los almacena en csv_files'''

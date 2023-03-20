@@ -5,6 +5,7 @@ from modules.globalVar import RECIPE_LIST
 from modules.NewRecipe import *
 from modules.ReadRecipe import ReadRecipe
 from modules.EditRecipe import EditRecipe
+import os
 
 class App(ttk.Frame):
     '''La clase representa la ventana principal donde el usuario vera las recetas y podra realizar el CRUD'''
@@ -121,6 +122,8 @@ class App(ttk.Frame):
                     try:
                         if int(recipe[0]) != int(select_item):
                             recipes.append(recipe)
+                        elif int(recipe[0]) == int(select_item):
+                            os.remove(recipe[8])
                     except ValueError:
                         pass
             with open(RECIPE_LIST, "w", newline="\n") as csvfile:
