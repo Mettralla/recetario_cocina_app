@@ -1,8 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import csv
-from modules.globalVar import METHOD_LIST, INGREDIENT_LIST, RECIPE_LIST
-from tkinter import messagebox as msg
+from modules.globalVar import RECIPE_LIST
 from PIL import ImageTk, Image
 
 class ReadRecipe(ttk.Frame):
@@ -123,7 +122,7 @@ class ReadRecipe(ttk.Frame):
         for i in range(len(ingredients)):
             self.ingredient_list.insert(
                 '', tk.END, values=[ingredients[i], amounts[i]])
-            
+
     def create_method_list(self) -> ttk.Treeview:
         '''Crea el treeview widget que contendra los pasos de preparacion'''
         # Numero de columnas y nombres

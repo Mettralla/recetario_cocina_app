@@ -241,12 +241,14 @@ class NewRecipe(ttk.Frame):
         if self.image != None:
             msg.showinfo(
                 message='Imagen agregada con exito',
-                title='Agregar imagen'
+                title='Agregar imagen',
+                parent=self.parent 
             )
         else:
             msg.showinfo(
                 message='Imagen no guardada', 
-                title='Agregar imagen'
+                title='Agregar imagen',
+                parent=self.parent 
         )
 
     def delete_method(self) -> None:
@@ -274,7 +276,7 @@ class NewRecipe(ttk.Frame):
                     )
             self.refresh_method_tree()
         except IndexError:
-            msg.showerror(message='No hay ningun paso en la lista', title='Eliminar paso de preparacion')
+            msg.showerror(message='No hay ningun paso en la lista', title='Eliminar paso de preparacion', parent = self.parent)
 
     def delete_ingredient(self) -> None:
         '''Borra el ultimo ingrediente de la lista'''
@@ -303,7 +305,8 @@ class NewRecipe(ttk.Frame):
             self.refresh_ingredient_tree()
         except IndexError:
             msg.showerror(message='No hay ningun ingrediente en la lista',
-                          title='Eliminar ingrediente')
+                          title='Eliminar ingrediente',
+                          parent = self.parent)
 
     def save(self) -> None:
         '''Toma los datos ingresados en la ventana y los almacena en csv_files'''
@@ -325,3 +328,5 @@ class NewRecipe(ttk.Frame):
                 }
             )
         self.parent.destroy()
+        msg.showinfo(message='Receta creada, actualice la lista',
+                      title='Receta agregada')

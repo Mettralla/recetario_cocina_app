@@ -195,7 +195,7 @@ class EditRecipe(ttk.Frame):
             self.load_ingredients()
             self.reset_file(INGREDIENT_LIST, ["nombre", "cantidad", "medida"])
         except UnboundLocalError:
-            msg.showerror(message='No realizo ningun cambio', title='Error al actualizar')
+            msg.showerror(message='No realizo ningun cambio', title='Error al actualizar', parent = self.parent)
 
     def delete_ingredient(self) -> None:
         '''Elimina el ultimo ingrediente de la lista de ingredientes'''
@@ -210,7 +210,7 @@ class EditRecipe(ttk.Frame):
             self.load_ingredients()
         except IndexError:
             msg.showerror(message='No hay ningun ingrediente en la lista',
-            title='Eliminar ingrediente')
+                          title='Eliminar ingrediente', parent=self.parent)
 
     def reset_file(self, route: str, fieldlist: list[str]) -> None:
         '''Elimina los items de las lista temporales dejando solo los encabezados.
@@ -280,7 +280,7 @@ class EditRecipe(ttk.Frame):
             self.reset_file(METHOD_LIST, ["id", "paso"])
         except UnboundLocalError:
             msg.showerror(message='No realizo ningun cambio',
-                          title='Error al actualizar')
+                          title='Error al actualizar', parent=self.parent)
 
     def delete_method(self) -> None:
         '''Elimina el ultimo elemento de la lista de preparacion'''
@@ -292,7 +292,7 @@ class EditRecipe(ttk.Frame):
             self.load_method_list()
         except IndexError:
             msg.showerror(message='No hay ningun ingrediente en la lista',
-                            title='Eliminar ingrediente')
+                          title='Eliminar ingrediente', parent=self.parent)
 
     def add_image(self) -> None:
         '''Guarda la direccion de la imagen a guardar'''
@@ -307,21 +307,23 @@ class EditRecipe(ttk.Frame):
             self.recipe['imagen'] = "images\\" + img_name  # CORREGIR FORMATO
             msg.showinfo(
                 message='Imagen agregada con exito',
-                title='Agregar imagen'
+                title='Agregar imagen',
+                parent=self.parent
             )
         else:
             msg.showinfo(
                 message='Imagen no guardada',
-                title='Agregar imagen'
+                title='Agregar imagen',
+                parent=self.parent
             )
             
     def delete_image(self) -> None:
         if self.recipe['imagen'] == 'None':
-            msg.showinfo(title='Borrar imagen', message='Esta receta no tiene imagen')
+            msg.showinfo(title='Borrar imagen', message='Esta receta no tiene imagen', parent=self.parent)
         else:
             os.remove(self.recipe['imagen'])
             self.recipe['imagen'] = 'None'
-            msg.showinfo(title='Borrar imagen', message='Imagen borrada')
+            msg.showinfo(title='Borrar imagen', message='Imagen borrada', parent = self.parent)
     
     def save(self) -> None:
         '''Toma los datos ingresados en la ventana y los almacena en csv_files'''

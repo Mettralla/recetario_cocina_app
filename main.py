@@ -106,9 +106,9 @@ class App(ttk.Frame):
         try:
             id = self.get_recipe_id()
             toplevel = tk.Toplevel(self.parent)
-            EditRecipe(toplevel, 'Editar Receta', id).grid()
+            EditRecipe(toplevel, 'Editar Receta', id)
         except IndexError:
-            msg.showerror(message='No ha seleccionado ningun item, haga click sobre un item y presione el boton.', title='Editar Receta')
+            msg.showerror(message='No ha seleccionado ningun item, haga click sobre un item y presione el boton.', title='Editar Receta', parent = self.parent)
         
     def delete_recipe(self) -> None:
         '''Elimina una receta del fichero csv'''
@@ -123,7 +123,8 @@ class App(ttk.Frame):
                         if int(recipe[0]) != int(select_item):
                             recipes.append(recipe)
                         elif int(recipe[0]) == int(select_item):
-                            os.remove(recipe[8])
+                            if recipe[8] != 'None':
+                                os.remove(recipe[8])
                     except ValueError:
                         pass
             with open(RECIPE_LIST, "w", newline="\n") as csvfile:
@@ -143,9 +144,9 @@ class App(ttk.Frame):
                             'imagen': recipe[8]
                         }
                     )
-            msg.showinfo(message='Receta eliminada con exito, actualice la lista', title='Eliminar Receta')
+            msg.showinfo(message='Receta eliminada con exito, actualice la lista', title='Eliminar Receta', parent = self.parent)
         except IndexError:
-            msg.showerror(message='No ha seleccionado ningun item, haga click sobre un item y presione el boton.', title='Eliminar Receta')
+            msg.showerror(message='No ha seleccionado ningun item, haga click sobre un item y presione el boton.', title='Eliminar Receta', parent=self.parent)
     
     def read_recipe(self) -> None:
         '''Abre una nueva ventana para leer una receta'''
@@ -155,7 +156,7 @@ class App(ttk.Frame):
             ReadRecipe(toplevel, 'Leer Receta', id).grid()
         except IndexError:
             msg.showerror(
-                message='No ha seleccionado ningun item, haga click sobre un item y presione el boton.', title='Ver Receta')
+                message='No ha seleccionado ningun item, haga click sobre un item y presione el boton.', title='Ver Receta', parent=self.parent)
         
     def refresh_recipe_tree(self) -> None:
         '''Actualiza la lista de recetas'''
