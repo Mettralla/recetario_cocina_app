@@ -43,6 +43,8 @@ class NewRecipe(ttk.Frame):
         self.name = tk.StringVar()
         self.preparation_time = tk.IntVar()
         self.cooking_time = tk.IntVar()
+        self.tags = tk.StringVar()
+        self.favorite = tk.IntVar()
 
         # NOMBRE DE LA RECETA
         ttk.Label(self.parent, text="Nombre:", padding=3).grid(
@@ -77,23 +79,34 @@ class NewRecipe(ttk.Frame):
         
         # TIEMPO DE PREPARACION
         ttk.Label(self.parent, text="Tiempo de Preparacion:", padding=3).grid(
-            row=5, column=1, columnspan=3, sticky=tk.EW)
+            row=5, column=1, sticky=tk.EW)
         ttk.Entry(self.parent, textvariable=self.preparation_time, justify= tk.RIGHT).grid(
-            row=5, column=3, columnspan=3, sticky=tk.EW)
+            row=5, column=2, sticky=tk.EW)
         
         # TIEMPO DE COCCION
         ttk.Label(self.parent, text="Tiempo de Cocción:", padding=3).grid(
-            row=6, column=1, columnspan=3,sticky=tk.EW)
+            row=5, column=4,sticky=tk.EW)
         ttk.Entry(self.parent, textvariable=self.cooking_time, justify= tk.RIGHT).grid(
-            row=6, column=3, columnspan=3, sticky=tk.EW)
+            row=5, column=5, sticky=tk.EW)
+        
+        # Tags
+        ttk.Label(self.parent, text="Etiquetas:", padding=3).grid(
+            row=6, column=1, sticky=tk.EW)
+        ttk.Entry(self.parent, justify=tk.RIGHT).grid(
+            row=6, column=2, sticky=tk.EW)
+        
+        # Fav
+        ttk.Label(self.parent, text="Favorita:", padding=3).grid(
+            row=6, column=4, sticky=tk.EW)
+        ttk.Checkbutton(self.parent, textvariable=self.favorite).grid(row=6, column=5, sticky=tk.EW)
         
         # IMAGEN
         ttk.Label(self.parent, text="Imagen:", padding=3).grid(
             row=7, column=1, columnspan=1, sticky=tk.EW)
-        # ttk.Entry(self.parent).grid(
-        #     row=7, column=2, columnspan=3, sticky=tk.EW)
+        ttk.Entry(self.parent).grid(
+            row=7, column=2, columnspan=3, sticky=tk.EW)
         ttk.Button(self.parent, text="Agregar", command=self.add_image).grid(
-            row=7, column=3, columnspan=3, sticky=tk.EW)
+            row=7, column=5, sticky=tk.EW)
         
         # BOTONERA
         ttk.Button(self.parent, text="Crear", command=self.save).grid(row=8, column=1, columnspan=2, sticky=tk.NSEW, padx=5, pady=5)
