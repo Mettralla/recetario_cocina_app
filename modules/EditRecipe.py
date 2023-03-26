@@ -24,6 +24,7 @@ class EditRecipe(ttk.Frame):
         self.favorite = tk.StringVar()
 
         parent.title(title)
+        # parent.geometry('600x720')
         parent.geometry('580x650')
         parent.resizable(0, 0)
 
@@ -77,8 +78,8 @@ class EditRecipe(ttk.Frame):
                 except ValueError:
                     pass
         return selected_recipe
-        
-    
+
+
     def create_ui(self) -> None:
         '''Crea la interfaz que usara el usuario para crear la receta'''
         # NOMBRE DE LA RECETA
@@ -335,7 +336,7 @@ class EditRecipe(ttk.Frame):
                 title='Agregar imagen',
                 parent=self.parent
             )
-            
+
     def delete_image(self) -> None:
         if self.recipe['imagen'] == 'None':
             msg.showinfo(title='Borrar imagen', message='Esta receta no tiene imagen', parent=self.parent)
@@ -343,7 +344,7 @@ class EditRecipe(ttk.Frame):
             os.remove(self.recipe['imagen'])
             self.recipe['imagen'] = 'None'
             msg.showinfo(title='Borrar imagen', message='Imagen borrada', parent = self.parent)
-    
+
     def save(self) -> None:
         '''Toma los datos ingresados en la ventana y los almacena en csv_files'''
         recipes = []

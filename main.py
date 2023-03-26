@@ -1,11 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
 import csv
-from modules.globalVar import RECIPE_LIST
+from modules.globalVar import RECIPE_LIST, RECIPE_OF_THE_DAY
 from modules.NewRecipe import *
 from modules.ReadRecipe import ReadRecipe
 from modules.EditRecipe import EditRecipe
 import os
+from datetime import datetime
+import random
 
 class App(ttk.Frame):
     '''La clase representa la ventana principal donde el usuario vera las recetas y podra realizar el CRUD'''
@@ -19,13 +21,22 @@ class App(ttk.Frame):
         parent.geometry('1280x720')
         parent.title('Kitchen App')
         parent.resizable(0, 0)
+        # parent.config(bg='#000000')
+        # self.style = ttk.Style()
+        # self.style.theme_use('alt')
+
+        # Add the rowheight
+        # self.style.configure('Treeview', rowheight=30)
+        # self.style.configure('Label', background='green')
 
         # BUTTONS
         self.set_ui()
+        self.new_day()
 
         # DATA LIST
         self.tree = self.create_tree()
         self.read_data()
+        
 
         # GRID
         # COLUMNS
@@ -112,11 +123,18 @@ class App(ttk.Frame):
 
     def read_data(self) -> None:
         '''Lee el fichero csv e inserta los datos en el treeview'''
+        if self.new_day():
+            self.save_recipe_otd()
+        recipe_otd = self.get_recipe_otd()
+        recipe_otd_data = self.read_recipe_otd()
         with open(RECIPE_LIST, newline="\n") as csvfile:
             reader = csv.DictReader(csvfile)
+            self.tree.insert('', tk.END, values=recipe_otd, tags="recipe_otd")
+            self.tree.tag_configure("recipe_otd", foreground="white", background="black")
             for recipe in reader:
-                data = [recipe['id'],recipe["nombre"], recipe["ingredientes"], recipe["tiempo de preparacion"], recipe["tiempo de coccion"], recipe["creado"]]
-                self.tree.insert('', tk.END, values= data)
+                if recipe['id'] != recipe_otd_data[0]:
+                    data = [recipe['id'],recipe["nombre"], recipe["ingredientes"], recipe["tiempo de preparacion"], recipe["tiempo de coccion"], recipe["creado"]]
+                    self.tree.insert('', tk.END, values= data)
 
     #CRUD
     def new_recipe(self) -> None:
@@ -209,7 +227,7 @@ class App(ttk.Frame):
             self.search_by_ingredients(fieldlist, search_in)
         else:
             msg.showerror(title='Buscar', message='Error! Escoja una opcion valida')
-        
+
     def read_search_data(self, recipes: list[dict]) -> None:
         '''Lee el fichero csv e inserta los datos en el treeview'''
         if len(recipes) != 0:
@@ -249,7 +267,7 @@ class App(ttk.Frame):
                     if tag.strip() in tags.split(',') and recipe not in found_recipes:
                         found_recipes.append(recipe)
         self.read_search_data(found_recipes)
-    
+
     def search_by_prep_time(self, fieldlist: list[str], prep_time: str) -> None:
         '''Busca las recetas que coincidan con el tiempo de preparacion deseado.
             params:
@@ -262,7 +280,7 @@ class App(ttk.Frame):
                 if recipe['tiempo de preparacion'].split(' ')[0] == prep_time.split(' ')[0]:
                     found_recipes.append(recipe)
         self.read_search_data(found_recipes)
-        
+
     def search_by_ingredients(self, fieldlist: list[str], ingredients: str) -> None:
         '''Busca las recetas que contengan los ingredientes ingresados.
             params:
@@ -276,6 +294,63 @@ class App(ttk.Frame):
                     if searched_ingredient.strip() in recipe['ingredientes'].split(',') and recipe not in found_recipes:
                         found_recipes.append(recipe)
         self.read_search_data(found_recipes)
+
+    def new_recipe_otd_id(self) -> int:
+        fieldlist = ["id", "nombre", "ingredientes", "cantidades", "preparacion",
+                     "tiempo de preparacion", "tiempo de coccion", "creado", "imagen", "etiquetas", "favorito"]
+        ids = []
+        with open(RECIPE_LIST,  "r", newline="\n") as csvfile:
+            reader = csv.DictReader(csvfile, fieldnames=fieldlist)
+            for recipe in reader:
+                if recipe['id'] != 'id':
+                    ids.append(recipe['id'])
+        rand_recipe = random.randint(0, len(ids) - 1)
+        return ids[rand_recipe]
+
+    def save_recipe_otd(self) -> None:
+        fieldlist = ["id", "dia"]
+        with open(RECIPE_OF_THE_DAY, "w", newline="\n") as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=fieldlist)
+            writer.writeheader()
+            writer.writerow({'id': self.new_recipe_otd_id(), 'dia': datetime.now().strftime("%Y,%m,%d")})
+
+    def read_recipe_otd(self) -> list:
+        recipe_otd = []
+        fieldlist = ["id", "dia"]
+        with open(RECIPE_OF_THE_DAY,  "r", newline="\n") as csvfile:
+            reader = csv.DictReader(csvfile, fieldnames=fieldlist)
+            for recipe in reader:
+                if recipe['id'] != 'id':
+                    recipe_otd.append(recipe['id'])
+                    recipe_otd.append(recipe['dia'])
+        return recipe_otd
+
+    def count_recipes(self) -> int:
+        count = 0
+        with open(RECIPE_LIST,  "r", newline="\n") as csvfile:
+            reader = csv.reader(csvfile)
+            for _ in reader:
+                count += 1
+        return count
+    
+    def new_day(self):
+        recipe_otd = self.read_recipe_otd()
+        rotd_to_list = recipe_otd[1].split(',')
+        rotd_day = datetime(int(rotd_to_list[0]), int(rotd_to_list[1]), int(rotd_to_list[2]))
+        delta = datetime.now() - rotd_day
+        return True if delta.days != 0 else False
+
+    def get_recipe_otd(self) -> dict:
+        '''Lee el fichero, identifica la receta a traves del id y la convierte en un diccionario lista para ser mostrada'''
+        recipe_otd_data = self.read_recipe_otd()
+        with open(RECIPE_LIST, "r", newline="\n") as csvfile:
+            reader = csv.DictReader(csvfile)
+            for recipe in reader:
+                try:
+                    if recipe['id'] == recipe_otd_data[0]:
+                        return [recipe['id'], recipe["nombre"], recipe["ingredientes"], recipe["tiempo de preparacion"], recipe["tiempo de coccion"], recipe["creado"]]
+                except ValueError:
+                    pass
 
 root = tk.Tk()
 App(root).grid()
