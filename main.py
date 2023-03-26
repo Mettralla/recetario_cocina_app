@@ -36,13 +36,11 @@ class App(ttk.Frame):
         parent.columnconfigure(4, weight=1)
         # ROWS
         parent.rowconfigure(0, weight=1)
-        parent.rowconfigure(1, weight=6)
-        parent.rowconfigure(2, weight=6)
-        parent.rowconfigure(3, weight=6)
-        parent.rowconfigure(4, weight=6)
-        parent.rowconfigure(5, weight=6)
-        
-
+        parent.rowconfigure(1, weight=7)
+        parent.rowconfigure(2, weight=7)
+        parent.rowconfigure(3, weight=7)
+        parent.rowconfigure(4, weight=7)
+        parent.rowconfigure(5, weight=7)
 
     def set_ui(self) -> ttk.Button:
         '''Crea los botones y los ubica en la grilla'''
@@ -65,12 +63,12 @@ class App(ttk.Frame):
             row=5, column=0, padx=10, pady=5, sticky=(tk.NSEW))
         
         ttk.Combobox(self.parent, textvariable=self.search_option, 
-            values=['Nombre', 'Etiquetas', 'Tiempo de Preparacion', 'Ingredientes']).grid(row=0, column=1, padx=10, pady=5, sticky=tk.NSEW)
+            values=['Nombre', 'Etiquetas', 'Tiempo de Preparacion', 'Ingredientes'], justify=tk.RIGHT).grid(row=0, column=1, padx=10, pady=5, sticky=tk.NSEW)
         ttk.Entry(self.parent, textvariable=self.search_input, justify=tk.RIGHT).grid(
             row=0, column=2, padx=5, pady=5, sticky=tk.NSEW)
-        ttk.Button(self.parent, text="Buscar", command=self.refresh_recipe_tree).grid(
+        ttk.Button(self.parent, text="Buscar", command=self.search).grid(
             row=0, column=3, padx=10, pady=5, sticky=(tk.NSEW))
-        ttk.Button(self.parent, text="Actualizar", command=self.refresh_recipe_tree).grid(
+        ttk.Button(self.parent, text="Reset", command=self.refresh_recipe_tree).grid(
             row=0, column=4, padx=10, pady=5, sticky=(tk.NSEW))
 
 
@@ -125,7 +123,7 @@ class App(ttk.Frame):
         '''Abre una nueva ventana para agregar una receta'''
         toplevel = tk.Toplevel(self.parent)
         NewRecipe(toplevel, 'Agregar Receta').grid()
-        
+
     def edit_recipe(self) -> None:
         '''Abre una ventana para agregar una receta'''
         try:
@@ -134,7 +132,7 @@ class App(ttk.Frame):
             EditRecipe(toplevel, 'Editar Receta', id)
         except IndexError:
             msg.showerror(message='No ha seleccionado ningun item, haga click sobre un item y presione el boton.', title='Editar Receta', parent = self.parent)
-        
+
     def delete_recipe(self) -> None:
         '''Elimina una receta del fichero csv'''
         try:
@@ -194,6 +192,90 @@ class App(ttk.Frame):
         '''Guarda el id del item seleccionado al presionar un boton'''
         select_item = self.tree.focus()
         return self.tree.item(select_item)['values'][0]
+
+    def search(self) -> None:
+        '''Recibe los datos ingresados en entry y lo redirige a la busqueda adecuada e inserta los valores en treeview.'''
+        option = self.search_option.get()
+        search_in = self.search_input.get()
+        fieldlist = ["id", "nombre", "ingredientes", "cantidades", "preparacion",
+                     "tiempo de preparacion", "tiempo de coccion", "creado", "imagen", "etiquetas", "favorito"]
+        if option == 'Nombre':
+            self.search_by_name(fieldlist, search_in)
+        elif option == 'Etiquetas':
+            self.search_by_tags(fieldlist, search_in)
+        elif option == 'Tiempo de Preparacion':
+            self.search_by_prep_time(fieldlist, search_in)
+        elif option == 'Ingredientes':
+            self.search_by_ingredients(fieldlist, search_in)
+        else:
+            msg.showerror(title='Buscar', message='Error! Escoja una opcion valida')
+        
+    def read_search_data(self, recipes: list[dict]) -> None:
+        '''Lee el fichero csv e inserta los datos en el treeview'''
+        if len(recipes) != 0:
+            self.tree = self.create_tree()
+            for recipe in recipes:
+                data = [recipe['id'], recipe["nombre"], recipe["ingredientes"],
+                        recipe["tiempo de preparacion"], recipe["tiempo de coccion"], recipe["creado"]]
+                self.tree.insert('', tk.END, values=data)
+        else:
+            msg.showwarning(
+                title='Buscar', message='No se ha encontrado coincidencias', parent=self.parent)
+
+            
+    def search_by_name(self, fieldlist: list[str], name: str) -> None:
+        '''Busca las recetas por nombre.
+            params:
+                (list[str]): fieldlist: keys del diccionario Receta.
+                (str) name: nombre buscado.'''
+        found_recipes = []
+        with open(RECIPE_LIST,  "r", newline="\n") as csvfile:
+            reader = csv.DictReader(csvfile, fieldnames=fieldlist)
+            for recipe in reader:
+                if recipe['nombre'].lower() == name.lower():
+                    found_recipes.append(recipe)
+        self.read_search_data(found_recipes)
+
+    def search_by_tags(self, fieldlist: list[str], tags: str) -> None:
+        '''Busca las recetas que tengan las etiquetas buscadas.
+            params:
+                (list[str]): fieldlist: keys del diccionario Receta.
+                (str) tags: las etiquetas buscados separados por coma.'''
+        found_recipes = []
+        with open(RECIPE_LIST,  "r", newline="\n") as csvfile:
+            reader = csv.DictReader(csvfile, fieldnames=fieldlist)
+            for recipe in reader:
+                for tag in recipe['etiquetas'].split(','):
+                    if tag.strip() in tags.split(',') and recipe not in found_recipes:
+                        found_recipes.append(recipe)
+        self.read_search_data(found_recipes)
+    
+    def search_by_prep_time(self, fieldlist: list[str], prep_time: str) -> None:
+        '''Busca las recetas que coincidan con el tiempo de preparacion deseado.
+            params:
+                (list[str]): fieldlist: keys del diccionario Receta.
+                (str) prep_time: el tiempo de preparacion buscado.'''
+        found_recipes = []
+        with open(RECIPE_LIST,  "r", newline="\n") as csvfile:
+            reader = csv.DictReader(csvfile, fieldnames=fieldlist)
+            for recipe in reader:
+                if recipe['tiempo de preparacion'].split(' ')[0] == prep_time.split(' ')[0]:
+                    found_recipes.append(recipe)
+        self.read_search_data(found_recipes)
+        
+    def search_by_ingredients(self, fieldlist: list[str], ingredients: str) -> None:
+        '''Busca las recetas que contengan los ingredientes ingresados.
+            params:
+                (list[str]): fieldlist: keys del diccionario Receta.
+                (str) ingredients: los ingredientes buscados separados por coma.'''
+        found_recipes = []
+        with open(RECIPE_LIST,  "r", newline="\n") as csvfile:
+            reader = csv.DictReader(csvfile, fieldnames=fieldlist)
+            for recipe in reader:
+                for searched_ingredient in ingredients.split(','):
+                    if searched_ingredient.strip() in recipe['ingredientes'].split(',') and recipe not in found_recipes:
+                        found_recipes.append(recipe)
+        self.read_search_data(found_recipes)
 
 root = tk.Tk()
 App(root).grid()

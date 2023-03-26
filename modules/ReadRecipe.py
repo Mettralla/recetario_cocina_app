@@ -116,7 +116,7 @@ class ReadRecipe(ttk.Frame):
     def create_ingredient_list(self) -> ttk.Treeview:
         '''Crea el treeview widget que contendra los ingredientes'''
         # Numero de columnas y nombres
-        columns = ('Ingredientes', 'Cantidad')
+        columns = ('Cantidad', 'Ingredientes')
         # Crea el widget
         ingredient_tree = ttk.Treeview(
             self.parent, columns=columns, show='headings', height=5)
@@ -124,10 +124,10 @@ class ReadRecipe(ttk.Frame):
         ingredient_tree.grid(row=2, column=1, sticky=(
             tk.NSEW), padx=5, columnspan=5)
         # Se agregan los encabezados
-        ingredient_tree.heading('Ingredientes', text='Ingredientes')
-        ingredient_tree.column(0, anchor=tk.CENTER)
         ingredient_tree.heading('Cantidad', text='Cantidad')
-        ingredient_tree.column(1, anchor=tk.CENTER, stretch=tk.NO, width=160)
+        ingredient_tree.column(0, anchor=tk.CENTER, stretch=tk.NO, width=120)
+        ingredient_tree.heading('Ingredientes', text='Ingredientes')
+        ingredient_tree.column(1)
 
         return ingredient_tree
         
@@ -137,7 +137,7 @@ class ReadRecipe(ttk.Frame):
         amounts = self.recipe['cantidades'].split(',')
         for i in range(len(ingredients)):
             self.ingredient_list.insert(
-                '', tk.END, values=[ingredients[i], amounts[i]])
+                '', tk.END, values=[amounts[i], ingredients[i]])
 
     def create_method_list(self) -> ttk.Treeview:
         '''Crea el treeview widget que contendra los pasos de preparacion'''

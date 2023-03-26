@@ -36,7 +36,7 @@ class AddMethod(ttk.Frame):
         ttk.Label(self.parent, text="Paso de Preparacion:", padding=3).grid(
             row=0, column=1, sticky=tk.EW, columnspan=2
         )
-        tk.Entry(self.parent, textvariable=self.cooking_method).grid(
+        tk.Entry(self.parent, textvariable=self.cooking_method, justify=tk.RIGHT).grid(
             row=1, column=1, sticky=tk.EW, columnspan=2
         )
         # BOTONES: AGREGAR || CANCELAR

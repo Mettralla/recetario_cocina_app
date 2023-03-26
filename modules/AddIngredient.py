@@ -41,17 +41,17 @@ class AddIngredient(ttk.Frame):
         # NOMBRE DEL INGREDIENTE
         ttk.Label(self.parent, text="Ingredientes:", padding=3).grid(
             row=0, column=1, sticky=tk.EW)
-        ttk.Entry(self.parent, textvariable=self.ingrediente).grid(
+        ttk.Entry(self.parent, textvariable=self.ingrediente, justify=tk.RIGHT).grid(
             row=0, column=2, sticky=tk.EW)
         # CANTIDAD DEL INGREDIENTE
         ttk.Label(self.parent, text="Cantidad:", padding=3).grid(
             row=1, column=1, sticky=tk.EW)
-        ttk.Entry(self.parent, textvariable=self.cantidad, justify='right').grid(
+        ttk.Entry(self.parent, textvariable=self.cantidad, justify=tk.RIGHT).grid(
             row=1, column=2, sticky=tk.EW, padx=5)
         # SELECCIONAR MEDIDA
         ttk.Label(self.parent, text="Medida:", padding=3).grid(
             row=2, column=1, sticky=tk.EW)
-        ttk.Combobox(self.parent, textvariable=self.medida, values=self.medidas).grid(
+        ttk.Combobox(self.parent, textvariable=self.medida, values=self.medidas, justify=tk.RIGHT).grid(
             row=2, column=2, sticky=tk.EW)
         # BOTONES : AGREGAR || CANCELAR
         ttk.Button(self.parent, text="Agregar", command=self.add_ingredient).grid(

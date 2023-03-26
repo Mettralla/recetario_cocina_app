@@ -46,7 +46,7 @@ class Recipe():
             ingredient_list += ingredient.get_name()
             if self.ingredients[-1] != ingredient:
                 ingredient_list += ','
-        return ingredient_list
+        return ingredient_list.lower()
 
     def get_amounts(self) -> str:
         '''Transforma la lista de cantidades y metricas en string y la devuelve'''
