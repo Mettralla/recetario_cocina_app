@@ -103,10 +103,10 @@ class NewRecipe(ttk.Frame):
         # IMAGEN
         ttk.Label(self.parent, text="Imagen:", padding=3).grid(
             row=7, column=1, columnspan=1, sticky=tk.EW)
-        ttk.Entry(self.parent).grid(
-            row=7, column=2, columnspan=3, sticky=tk.EW)
+        # ttk.Entry(self.parent).grid(
+        #     row=7, column=2, columnspan=3, sticky=tk.EW)
         ttk.Button(self.parent, text="Agregar", command=self.add_image).grid(
-            row=7, column=5, sticky=tk.EW)
+            row=7, column=3, columnspan=3, sticky=tk.EW)
         
         # BOTONERA
         ttk.Button(self.parent, text="Crear", command=self.save).grid(row=8, column=1, columnspan=2, sticky=tk.NSEW, padx=5, pady=5)

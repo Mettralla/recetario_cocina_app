@@ -20,6 +20,8 @@ class EditRecipe(ttk.Frame):
         self.name = tk.StringVar()
         self.preparation_time = tk.StringVar()
         self.cooking_time = tk.StringVar()
+        self.tags = tk.StringVar()
+        self.favorite = tk.StringVar()
 
         parent.title(title)
         parent.geometry('580x650')
@@ -65,7 +67,10 @@ class EditRecipe(ttk.Frame):
                             'tiempo de preparacion': recipe[5],
                             'tiempo de coccion': recipe[6],
                             'creado': recipe[7],
-                            'imagen': recipe[8]
+                            'imagen': recipe[8],
+                            'etiquetas': recipe[9],
+                            'favorito': recipe[10]
+                            
                         }
                     else:
                         pass
@@ -110,15 +115,27 @@ class EditRecipe(ttk.Frame):
 
         # TIEMPO DE PREPARACION
         ttk.Label(self.parent, text="Tiempo de Preparacion:", padding=3).grid(
-            row=5, column=1, columnspan=3, sticky=tk.EW)
+            row=5, column=1, sticky=tk.EW)
         ttk.Entry(self.parent, textvariable=self.preparation_time, justify=tk.RIGHT).grid(
-            row=5, column=3, columnspan=3, sticky=tk.EW)
+            row=5, column=2, sticky=tk.EW)
 
         # TIEMPO DE COCCION
         ttk.Label(self.parent, text="Tiempo de Cocción:", padding=3).grid(
-            row=6, column=1, columnspan=3, sticky=tk.EW)
+            row=5, column=4, sticky=tk.EW)
         ttk.Entry(self.parent, textvariable=self.cooking_time, justify=tk.RIGHT).grid(
-            row=6, column=3, columnspan=3, sticky=tk.EW)
+            row=5, column=5, sticky=tk.EW)
+        
+        # Tags
+        ttk.Label(self.parent, text="Etiquetas:", padding=3).grid(
+            row=6, column=1, sticky=tk.EW)
+        ttk.Entry(self.parent, textvariable=self.tags, justify=tk.RIGHT).grid(
+            row=6, column=2, sticky=tk.EW)
+
+        # Fav
+        ttk.Label(self.parent, text="Favorita:", padding=3).grid(
+            row=6, column=4, sticky=tk.EW)
+        ttk.Combobox(self.parent, textvariable=self.favorite, values=[
+                     'Si', 'No']).grid(row=6, column=5, sticky=tk.EW)
 
         # IMAGEN
         ttk.Label(self.parent, text="Imagen:", padding=3).grid(
@@ -139,6 +156,8 @@ class EditRecipe(ttk.Frame):
         self.name.set(self.recipe['nombre'])
         self.preparation_time.set(self.recipe['tiempo de preparacion'])
         self.cooking_time.set(self.recipe['tiempo de coccion'])
+        self.tags.set(self.recipe['etiquetas'])
+        self.favorite.set(self.recipe['favorito'])
 
     #   INGREDIENTES
     def create_ingredient_list(self) -> ttk.Treeview:
@@ -342,7 +361,9 @@ class EditRecipe(ttk.Frame):
                             'tiempo de preparacion': recipe[5],
                             'tiempo de coccion': recipe[6],
                             'creado': recipe[7],
-                            'imagen': recipe[8]
+                            'imagen': recipe[8],
+                            'etiquetas': recipe[9],
+                            'favorito': recipe[10]
                         }
                         recipes.append(selected_recipe)
                     elif int(recipe[0]) == self.id:
@@ -355,7 +376,10 @@ class EditRecipe(ttk.Frame):
                             'tiempo de preparacion': self.preparation_time.get(),
                             'tiempo de coccion': self.cooking_time.get(),
                             'creado': self.recipe['creado'],
-                            'imagen': self.recipe['imagen']
+                            'imagen': self.recipe['imagen'],
+                            'etiquetas': self.tags.get(),
+                            'favorito': self.favorite.get()
+                            
                         }
                         recipes.append(edited_recipe)
                     else:
@@ -364,7 +388,7 @@ class EditRecipe(ttk.Frame):
                     pass
         
         fields = ['id', 'nombre', 'ingredientes', 'cantidades', 'preparacion',
-                            'tiempo de preparacion', 'tiempo de coccion', 'creado', 'imagen']
+                  'tiempo de preparacion', 'tiempo de coccion', 'creado', 'imagen', 'etiquetas', 'favorito']
         with open(RECIPE_LIST, 'w', newline='\n') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fields)
             writer.writeheader()
@@ -379,7 +403,9 @@ class EditRecipe(ttk.Frame):
                         'tiempo de preparacion': recipe['tiempo de preparacion'],
                         'tiempo de coccion': recipe['tiempo de coccion'],
                         'creado': recipe['creado'],
-                        'imagen': recipe['imagen']
+                        'imagen': recipe['imagen'],
+                        'etiquetas': recipe['etiquetas'],
+                        'favorito': recipe['favorito']
                     }
                 )
         self.parent.destroy()
