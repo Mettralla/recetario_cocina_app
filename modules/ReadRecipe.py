@@ -10,7 +10,11 @@ class ReadRecipe(ttk.Frame):
         self.parent = parent
         self.id = recipe_id
         self.recipe = self.get_recipe()
-
+        self.star = ImageTk.PhotoImage(
+            Image.open('images\star.png').resize((30, 30)))
+        self.empty_star = ImageTk.PhotoImage(
+            Image.open('images\empty_star.png').resize((30, 30)))
+        
         parent.title(title)
         parent.geometry('580x650')
         parent.resizable(0, 0)
@@ -32,7 +36,7 @@ class ReadRecipe(ttk.Frame):
         parent.rowconfigure(4, weight=2)  # Prep list
         parent.rowconfigure(5, weight=1)  # Time prep
         parent.rowconfigure(6, weight=1)  # time cocc
-        # parent.rowconfigure(7, weight=1)  # time cocc
+        parent.rowconfigure(7, weight=1)  # time cocc
         # parent.rowconfigure(8, weight=1)  # buttons
         
         self.create_ui()
@@ -55,7 +59,9 @@ class ReadRecipe(ttk.Frame):
                             'tiempo de preparacion': recipe[5],
                             'tiempo de coccion': recipe[6],
                             'creado': recipe[7],
-                            'imagen': recipe[8]
+                            'imagen': recipe[8],
+                            'etiquetas': recipe[9],
+                            'favorito': recipe[10]
                         }
                     else: 
                         pass
@@ -66,7 +72,12 @@ class ReadRecipe(ttk.Frame):
     def create_ui(self) -> None:
         '''Muestra la receta'''
         # TITULO
-        ttk.Label(self.parent, text=self.recipe['nombre'], font=('Arial', 25)).grid(row=0, column=1, sticky=tk.EW)
+        if self.recipe['favorito'] == 'Si':
+            ttk.Label(self.parent, text=self.recipe['nombre'], font=(
+                'Arial', 25), image=self.star, compound=tk.LEFT, justify=tk.LEFT).grid(row=0, column=1)
+        else: 
+            ttk.Label(self.parent, text=self.recipe['nombre'], font=(
+                'Arial', 25), image=self.empty_star, compound=tk.LEFT, justify=tk.LEFT).grid(row=0, column=1)
         
         # IMAGEN
         if self.recipe['imagen'] != 'None':
@@ -95,9 +106,12 @@ class ReadRecipe(ttk.Frame):
         ttk.Label(self.parent, text=f"Tiempo de Cocción: {self.recipe['tiempo de coccion']}", padding=3).grid(
             row=5, column=3, columnspan=3, sticky=tk.EW)
         
+        ttk.Label(self.parent, text=f"Etiquetas: {self.recipe['etiquetas']}", padding=3).grid(
+            row=6, column=1, columnspan=5, sticky=tk.EW)
+        
         # BOTON
         ttk.Button(self.parent, text="Cerrar", command=self.parent.destroy).grid(
-            row=6, column=1, columnspan=5, sticky=tk.NSEW, padx=5, pady=5)
+            row=7, column=1, columnspan=5, sticky=tk.NSEW, padx=5, pady=5)
         
     def create_ingredient_list(self) -> ttk.Treeview:
         '''Crea el treeview widget que contendra los ingredientes'''
@@ -126,7 +140,7 @@ class ReadRecipe(ttk.Frame):
     def create_method_list(self) -> ttk.Treeview:
         '''Crea el treeview widget que contendra los pasos de preparacion'''
         # Numero de columnas y nombres
-        columns = ('Pasos')
+        columns = ('Id', 'Pasos')
         # Crea el widget
         method_tree = ttk.Treeview(self.parent, columns=columns,
                                    show='headings', height=5)
@@ -134,7 +148,9 @@ class ReadRecipe(ttk.Frame):
         method_tree.grid(row=4, column=1, sticky=(
             tk.NSEW), padx=5, columnspan=5)
         # Se agregan los encabezados
-        # method_tree.heading('Id', text='Id')
+        method_tree.heading('Id', text='Id')
+        method_tree.column(0, anchor=tk.CENTER, stretch=tk.NO, width=40)
+        
         method_tree.heading('Pasos', text='Pasos')
 
         return method_tree
@@ -144,7 +160,7 @@ class ReadRecipe(ttk.Frame):
         prep_methods = self.recipe['preparacion'].split(',')
         # print(prep_methods)
         for index, prep_method in enumerate(prep_methods, 1):
-            value = str(index) + '. ' + prep_method.strip()
+            prep_value = prep_method.strip()
             self.method_list.insert(
-                '', tk.END, values=[value]
+                '', tk.END, values=[index, prep_value]
             )
