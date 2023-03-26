@@ -70,13 +70,24 @@ class App(ttk.Frame):
         # INSERTARLO EN LA GRILLA
         tree.grid(row=2, column=0, sticky=(tk.NSEW), pady=10, padx=5, columnspan=5)
         # INSERTAR EL ENCABEZADO
+        #ID
         tree.heading('ID', text='ID')
+        tree.column(0, anchor=tk.CENTER, stretch=tk.NO, width=40)
+        #NOMBRE
         tree.heading('Nombre', text='Nombre')
+        tree.column(1, anchor=tk.CENTER)
+        #INGREDIENTES
         tree.heading('Ingredientes', text='Ingredientes')
-        # tree.heading('Preparacion', text='Preparacion')
+        tree.column(2, anchor=tk.CENTER)
+        #TIEMPO DE PREPARACION
         tree.heading('Tiempo de Preparacion', text='Tiempo de Preparacion')
+        tree.column(3, anchor=tk.CENTER)
+        #TIEMPO DE COCCION
         tree.heading('Tiempo de Coccion', text='Tiempo de Coccion')
+        tree.column(4, anchor=tk.CENTER)
+        #CREADO EN
         tree.heading('Creado', text='Creado')
+        tree.column(5, anchor=tk.CENTER)
 
         # AGREGAR SCROLLBAR
         scrollbar = ttk.Scrollbar(
@@ -115,7 +126,7 @@ class App(ttk.Frame):
         try:
             select_item = self.get_recipe_id()
             recipes = []
-            fieldlist = ["id", "nombre", "ingredientes", "cantidades", "preparacion", "tiempo de preparacion", "tiempo de coccion", "creado", "imagen"]
+            fieldlist = ["id", "nombre", "ingredientes", "cantidades", "preparacion", "tiempo de preparacion", "tiempo de coccion", "creado", "imagen", "etiquetas", "favorito"]
             with open(RECIPE_LIST, "r", newline="\n") as csvfile:
                 reader = csv.reader(csvfile)
                 for recipe in reader:
@@ -141,7 +152,9 @@ class App(ttk.Frame):
                             'tiempo de preparacion': recipe[5],
                             'tiempo de coccion': recipe[6],
                             'creado': recipe[7],
-                            'imagen': recipe[8]
+                            'imagen': recipe[8],
+                            'etiquetas': recipe[9],
+                            'favorito': recipe[10]
                         }
                     )
             msg.showinfo(message='Receta eliminada con exito, actualice la lista', title='Eliminar Receta', parent = self.parent)

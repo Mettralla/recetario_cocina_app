@@ -44,7 +44,7 @@ class NewRecipe(ttk.Frame):
         self.preparation_time = tk.IntVar()
         self.cooking_time = tk.IntVar()
         self.tags = tk.StringVar()
-        self.favorite = tk.IntVar()
+        self.favorite = tk.StringVar()
 
         # NOMBRE DE LA RECETA
         ttk.Label(self.parent, text="Nombre:", padding=3).grid(
@@ -92,13 +92,13 @@ class NewRecipe(ttk.Frame):
         # Tags
         ttk.Label(self.parent, text="Etiquetas:", padding=3).grid(
             row=6, column=1, sticky=tk.EW)
-        ttk.Entry(self.parent, justify=tk.RIGHT).grid(
+        ttk.Entry(self.parent, textvariable=self.tags, justify=tk.RIGHT).grid(
             row=6, column=2, sticky=tk.EW)
         
         # Fav
         ttk.Label(self.parent, text="Favorita:", padding=3).grid(
             row=6, column=4, sticky=tk.EW)
-        ttk.Checkbutton(self.parent, textvariable=self.favorite).grid(row=6, column=5, sticky=tk.EW)
+        ttk.Combobox(self.parent, textvariable=self.favorite, values=['Si', 'No']).grid(row=6, column=5, sticky=tk.EW)
         
         # IMAGEN
         ttk.Label(self.parent, text="Imagen:", padding=3).grid(
@@ -122,8 +122,12 @@ class NewRecipe(ttk.Frame):
         # Lo ubica en la grilla
         ingredient_tree.grid(row=2, column=1, sticky=(tk.NSEW), padx=5, columnspan=5)
         # Se agregan los encabezados
+        #INGREDIENTES
         ingredient_tree.heading('Ingredientes', text='Ingredientes')
+        ingredient_tree.column(0, anchor=tk.CENTER)
+        #CANTIDADES
         ingredient_tree.heading('Cantidad', text='Cantidad')
+        ingredient_tree.column(1, anchor=tk.CENTER, stretch=tk.NO, width=160)
 
         return ingredient_tree
     
@@ -157,8 +161,12 @@ class NewRecipe(ttk.Frame):
         # Lo ubica en la grilla
         method_tree.grid(row=4, column=1, sticky=(tk.NSEW), padx=5, columnspan=5)
         # Se agregan los encabezados
+        # ID
         method_tree.heading('Id', text='Id')
+        method_tree.column(0, anchor=tk.CENTER, stretch=tk.NO, width=40)
+        # PASO
         method_tree.heading('Paso', text='Paso')
+        method_tree.column(1, anchor=tk.CENTER)
         
         return method_tree
 
@@ -230,7 +238,9 @@ class NewRecipe(ttk.Frame):
             preparation = self.get_recipe_methods(),
             preparation_time = self.preparation_time.get(),
             cooking_time = self.cooking_time.get(),
-            image = self.image
+            image = self.image,
+            tags = self.tags.get(),
+            favorite= self.favorite.get()
         )
         return new_recipe.format_values()
     
@@ -324,7 +334,7 @@ class NewRecipe(ttk.Frame):
     def save(self) -> None:
         '''Toma los datos ingresados en la ventana y los almacena en csv_files'''
         new_recipe = self.get_recipe()
-        fields = ['id', 'nombre', 'ingredientes', 'cantidades', 'preparacion', 'tiempo de preparacion', 'tiempo de coccion', 'creado', 'imagen']
+        fields = ['id', 'nombre', 'ingredientes', 'cantidades', 'preparacion', 'tiempo de preparacion', 'tiempo de coccion', 'creado', 'imagen', 'etiquetas', 'favorito']
         with open(RECIPE_LIST, 'a') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fields)
             writer.writerow(
@@ -337,7 +347,9 @@ class NewRecipe(ttk.Frame):
                     'tiempo de preparacion': new_recipe['tiempo de preparacion'],
                     'tiempo de coccion': new_recipe['tiempo de coccion'],
                     'creado': new_recipe['creado'],
-                    'imagen': new_recipe['imagen']
+                    'imagen': new_recipe['imagen'],
+                    'etiquetas': new_recipe['etiquetas'],
+                    'favorito': new_recipe['favorito']
                 }
             )
         self.parent.destroy()

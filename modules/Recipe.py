@@ -16,7 +16,8 @@ class Recipe():
             (datetime) created_at: fecha y hora de creacion
     '''
     # PENDIENTE etiquetas: list, favorita: bool = False
-    def __init__(self, id: int, name: str, ingredients: list[Ingredient], preparation: list[str], preparation_time: int, cooking_time: int, created_at = datetime.now(), image: str = None) -> None:
+
+    def __init__(self, id: int, name: str, ingredients: list[Ingredient], preparation: list[str], preparation_time: int, cooking_time: int, tags: str, favorite: str, created_at = datetime.now(), image: str = None) -> None:
         self.id = id
         self.name = name
         self.ingredients = ingredients
@@ -25,6 +26,8 @@ class Recipe():
         self.cooking_time = cooking_time
         self.created_at = created_at
         self.image = image
+        self.tags = tags
+        self.favorite = favorite
         
     def get_id(self) -> str:
         '''Transforma el id en string y lo devuelve'''
@@ -79,6 +82,13 @@ class Recipe():
                 return 'None'
         except:
             msg.showerror(message='Un error sucedio durante la creacion de la imagen', title='Agregar Imagen')
+            
+    def get_tags(self) -> str:
+        print(type(self.tags))
+        return(str(self.tags))
+    
+    def get_favorite(self) -> str:
+        return self.favorite 
     
     def format_values(self) -> dict[str]:
         '''Toma todos los valores y regresa en un diccionario de strings, listo para insertarse en un csv'''
@@ -91,6 +101,8 @@ class Recipe():
             'tiempo de preparacion': self.get_prep_time(),
             'tiempo de coccion': self.get_cooking_time(),
             'creado': self.get_created_at(),
-            'imagen': self.get_source()
+            'imagen': self.get_source(),
+            'etiquetas': self.get_tags(),
+            'favorito': self.get_favorite()
         }
         return dict_recipe
