@@ -106,7 +106,7 @@ class ReadRecipe(ttk.Frame):
         ttk.Label(self.parent, text=f"Tiempo de Cocción: {self.recipe['tiempo de coccion']}", padding=3).grid(
             row=5, column=3, columnspan=3, sticky=tk.EW)
         
-        ttk.Label(self.parent, text=f"Etiquetas: {self.recipe['etiquetas']}", padding=3).grid(
+        ttk.Label(self.parent, text=f"Etiquetas: {self.recipe['etiquetas']}").grid(
             row=6, column=1, columnspan=5, sticky=tk.EW)
         
         # BOTON
@@ -125,7 +125,9 @@ class ReadRecipe(ttk.Frame):
             tk.NSEW), padx=5, columnspan=5)
         # Se agregan los encabezados
         ingredient_tree.heading('Ingredientes', text='Ingredientes')
+        ingredient_tree.column(0, anchor=tk.CENTER)
         ingredient_tree.heading('Cantidad', text='Cantidad')
+        ingredient_tree.column(1, anchor=tk.CENTER, stretch=tk.NO, width=160)
 
         return ingredient_tree
         

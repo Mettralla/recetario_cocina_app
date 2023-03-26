@@ -12,6 +12,8 @@ class App(ttk.Frame):
     def __init__(self, parent=None) -> None:
         super().__init__(parent, padding=(20))
         self.parent = parent
+        self.search_option = tk.StringVar()
+        self.search_input = tk.StringVar()
 
         # MAIN WINDOW
         parent.geometry('1280x720')
@@ -27,15 +29,18 @@ class App(ttk.Frame):
 
         # GRID
         # COLUMNS
-        parent.columnconfigure(0, weight=1)
+        parent.columnconfigure(0, weight=4)
         parent.columnconfigure(1, weight=1)
         parent.columnconfigure(2, weight=1)
         parent.columnconfigure(3, weight=1)
         parent.columnconfigure(4, weight=1)
         # ROWS
         parent.rowconfigure(0, weight=1)
-        parent.rowconfigure(1)
-        parent.rowconfigure(2, weight=12)
+        parent.rowconfigure(1, weight=6)
+        parent.rowconfigure(2, weight=6)
+        parent.rowconfigure(3, weight=6)
+        parent.rowconfigure(4, weight=6)
+        parent.rowconfigure(5, weight=6)
         
 
 
@@ -45,17 +50,26 @@ class App(ttk.Frame):
         # BUTTONS - CRUD + REFRESH
         # CREAR NUEVA RECETA
         ttk.Button(self.parent, text="Nueva", command=self.new_recipe).grid(
-            row=0, column=0, padx=10, pady=5, sticky=(tk.NSEW))
+            row=1, column=0, padx=10, pady=5, sticky=(tk.NSEW))
         # EDITAR RECETA EXISTENTE
         ttk.Button(self.parent, text="Editar", command=self.edit_recipe).grid(
-            row=0, column=1, padx=10, pady=5, sticky=(tk.NSEW))
+            row=2, column=0, padx=10, pady=5, sticky=(tk.NSEW))
         # VER UNA RECETA
         ttk.Button(self.parent, text="Ver", command=self.read_recipe).grid(
-            row=0, column=2, padx=10, pady=5, sticky=(tk.NSEW))
+            row=3, column=0, padx=10, pady=5, sticky=(tk.NSEW))
         # ELIMINAR UNA RECETA
         ttk.Button(self.parent, text="Eliminar", command=self.delete_recipe).grid(
-            row=0, column=3, padx=10, pady=5, sticky=(tk.NSEW))
+            row=4, column=0, padx=10, pady=5, sticky=(tk.NSEW))
         # ACTUALIZAR TREEVIEW
+        ttk.Button(self.parent, text="Actualizar", command=self.refresh_recipe_tree).grid(
+            row=5, column=0, padx=10, pady=5, sticky=(tk.NSEW))
+        
+        ttk.Combobox(self.parent, textvariable=self.search_option, 
+            values=['Nombre', 'Etiquetas', 'Tiempo de Preparacion', 'Ingredientes']).grid(row=0, column=1, padx=10, pady=5, sticky=tk.NSEW)
+        ttk.Entry(self.parent, textvariable=self.search_input, justify=tk.RIGHT).grid(
+            row=0, column=2, padx=5, pady=5, sticky=tk.NSEW)
+        ttk.Button(self.parent, text="Buscar", command=self.refresh_recipe_tree).grid(
+            row=0, column=3, padx=10, pady=5, sticky=(tk.NSEW))
         ttk.Button(self.parent, text="Actualizar", command=self.refresh_recipe_tree).grid(
             row=0, column=4, padx=10, pady=5, sticky=(tk.NSEW))
 
@@ -68,7 +82,7 @@ class App(ttk.Frame):
         # CREA EL WIDGET
         tree = ttk.Treeview(self.parent, columns=columns, show='headings')
         # INSERTARLO EN LA GRILLA
-        tree.grid(row=2, column=0, sticky=(tk.NSEW), pady=10, padx=5, columnspan=5)
+        tree.grid(row=1, column=1, sticky=(tk.NSEW), pady=10, padx=5, columnspan=4, rowspan=5)
         # INSERTAR EL ENCABEZADO
         #ID
         tree.heading('ID', text='ID')
@@ -93,7 +107,7 @@ class App(ttk.Frame):
         scrollbar = ttk.Scrollbar(
             self.parent, orient=tk.VERTICAL, command=tree.yview)
         tree.configure(yscroll=scrollbar.set)
-        scrollbar.grid(row=2, column=5, sticky=tk.NS, pady=10)
+        scrollbar.grid(row=1, column=5, sticky=tk.NS, pady=10, rowspan=5)
 
         return tree
 
