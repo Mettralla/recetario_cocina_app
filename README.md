@@ -2,7 +2,7 @@
  <img src=https://drive.google.com/uc?export=view&id=1gPr8aZ6T70vbZ4W6mSjCt1DXYtrLI26n alt="Banner"></a>
 </p>
 <h3 align="center">Recetario de Cocina</h3>
-https://drive.google.com/file/d/1gPr8aZ6T70vbZ4W6mSjCt1DXYtrLI26n/view?usp=share_link
+
 ---
 
 <p align="center"> Resolucion del Proyecto Integrador Final de la Catedra Programación 1 de la Carrera de Desarrollo de Software de la Universidad Provincial de Administración, Tecnologia y Oficios (UPATECO). Consiste en una aplicacion de escritorio donde puede almacenarse recetas de cocina.
