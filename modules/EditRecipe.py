@@ -143,7 +143,7 @@ class EditRecipe(ttk.Frame):
         ttk.Label(self.parent, text="Imagen:", padding=3).grid(
             row=7, column=1, columnspan=1, sticky=tk.EW)
         ttk.Button(self.parent, text="Agregar", command=self.add_image).grid(
-            row=7, column=3, columnspan=2, sticky=tk.EW)
+            row=7, column=2, columnspan=3, sticky=tk.EW)
         ttk.Button(self.parent, text="Borrar", command=self.delete_image).grid(
             row=7, column=5, sticky=tk.EW)
 
@@ -165,7 +165,7 @@ class EditRecipe(ttk.Frame):
     def create_ingredient_list(self) -> ttk.Treeview:
         '''Crea el treeview widget que contendra los ingredientes'''
         # Numero de columnas y nombres
-        columns = ('Ingredientes', 'Cantidad')
+        columns = ('Cantidad', 'Ingredientes')
         # Crea el widget
         ingredient_tree = ttk.Treeview(
             self.parent, columns=columns, show='headings', height=5)
@@ -173,8 +173,10 @@ class EditRecipe(ttk.Frame):
         ingredient_tree.grid(row=2, column=1, sticky=(
             tk.NSEW), padx=5, columnspan=5)
         # Se agregan los encabezados
-        ingredient_tree.heading('Ingredientes', text='Ingredientes')
         ingredient_tree.heading('Cantidad', text='Cantidad')
+        ingredient_tree.column(0, anchor=tk.CENTER, stretch=tk.NO, width=120)
+        ingredient_tree.heading('Ingredientes', text='Ingredientes')
+        ingredient_tree.column(1)
 
         return ingredient_tree
 
@@ -184,7 +186,7 @@ class EditRecipe(ttk.Frame):
         amounts = self.recipe['cantidades'].split(',')
         for ingredient, amount in zip(ingredients, amounts):
             self.ingredient_list.insert(
-                '', tk.END, values=[ingredient, amount])
+                '', tk.END, values=[amount, ingredient])
 
     def new_ingredient(self) -> None:
         '''Abre una ventana para agregar un ingrediente'''
@@ -264,8 +266,12 @@ class EditRecipe(ttk.Frame):
         method_tree.grid(row=4, column=1, sticky=(
             tk.NSEW), padx=5, columnspan=5)
         # Se agregan los encabezados
+        # ID
         method_tree.heading('Id', text='Id')
+        method_tree.column(0, anchor=tk.CENTER, stretch=tk.NO, width=40)
+        # PASO
         method_tree.heading('Paso', text='Paso')
+        method_tree.column(1)
 
         return method_tree
 

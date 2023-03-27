@@ -99,16 +99,16 @@ class App(ttk.Frame):
         tree.column(1, anchor=tk.CENTER)
         #INGREDIENTES
         tree.heading('Ingredientes', text='Ingredientes')
-        tree.column(2, anchor=tk.CENTER)
+        tree.column(2, anchor=tk.CENTER, stretch=tk.NO, width=350)
         #TIEMPO DE PREPARACION
         tree.heading('Tiempo de Preparacion', text='Tiempo de Preparacion')
-        tree.column(3, anchor=tk.CENTER)
+        tree.column(3, anchor=tk.CENTER, stretch=tk.NO, width=140)
         #TIEMPO DE COCCION
         tree.heading('Tiempo de Coccion', text='Tiempo de Coccion')
-        tree.column(4, anchor=tk.CENTER)
+        tree.column(4, anchor=tk.CENTER, stretch=tk.NO, width=140)
         #CREADO EN
         tree.heading('Creado', text='Creado')
-        tree.column(5, anchor=tk.CENTER)
+        tree.column(5, anchor=tk.CENTER, stretch=tk.NO, width=140)
 
         # AGREGAR SCROLLBAR
         scrollbar = ttk.Scrollbar(
@@ -346,7 +346,7 @@ class App(ttk.Frame):
             for recipe in reader:
                 try:
                     if recipe['id'] == recipe_otd_data[0]:
-                        return [recipe['id'], recipe["nombre"], recipe["ingredientes"], recipe["tiempo de preparacion"], recipe["tiempo de coccion"], recipe["creado"]]
+                        return [recipe['id'], recipe["nombre"] + " [RECETA DEL DIA]", recipe["ingredientes"], recipe["tiempo de preparacion"], recipe["tiempo de coccion"], recipe["creado"]]
                 except ValueError:
                     pass
 

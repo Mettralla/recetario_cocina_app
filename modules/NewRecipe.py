@@ -104,10 +104,8 @@ class NewRecipe(ttk.Frame):
         # IMAGEN
         ttk.Label(self.parent, text="Imagen:", padding=3).grid(
             row=7, column=1, columnspan=1, sticky=tk.EW)
-        # ttk.Entry(self.parent).grid(
-        #     row=7, column=2, columnspan=3, sticky=tk.EW)
         ttk.Button(self.parent, text="Agregar", command=self.add_image).grid(
-            row=7, column=3, columnspan=3, sticky=tk.EW)
+            row=7, column=2, columnspan=4, sticky=tk.EW)
         
         # BOTONERA
         ttk.Button(self.parent, text="Crear", command=self.save).grid(row=8, column=1, columnspan=2, sticky=tk.NSEW, padx=5, pady=5)
@@ -117,18 +115,18 @@ class NewRecipe(ttk.Frame):
     def create_ingredient_list(self) -> ttk.Treeview:
         '''Crea el treeview widget que contendra los ingredientes'''
         # Numero de columnas y nombres
-        columns = ('Ingredientes', 'Cantidad')
+        columns = ('Cantidad', 'Ingredientes')
         # Crea el widget
-        ingredient_tree = ttk.Treeview(self.parent, columns=columns, show='headings', height=5)
+        ingredient_tree = ttk.Treeview(
+            self.parent, columns=columns, show='headings', height=5)
         # Lo ubica en la grilla
-        ingredient_tree.grid(row=2, column=1, sticky=(tk.NSEW), padx=5, columnspan=5)
+        ingredient_tree.grid(row=2, column=1, sticky=(
+            tk.NSEW), padx=5, columnspan=5)
         # Se agregan los encabezados
-        #INGREDIENTES
-        ingredient_tree.heading('Ingredientes', text='Ingredientes')
-        ingredient_tree.column(0, anchor=tk.CENTER)
-        #CANTIDADES
         ingredient_tree.heading('Cantidad', text='Cantidad')
-        ingredient_tree.column(1, anchor=tk.CENTER, stretch=tk.NO, width=160)
+        ingredient_tree.column(0, anchor=tk.CENTER, stretch=tk.NO, width=120)
+        ingredient_tree.heading('Ingredientes', text='Ingredientes')
+        ingredient_tree.column(1)
 
         return ingredient_tree
     
@@ -137,8 +135,8 @@ class NewRecipe(ttk.Frame):
         with open(INGREDIENT_LIST, newline="\n") as csvfile:
             reader = csv.DictReader(csvfile)
             for ingredient in reader:
-                data = [ingredient["nombre"], ingredient["cantidad"] + ' ' +
-                        ingredient["medida"]]
+                data = [ingredient["cantidad"] + ' ' +
+                        ingredient["medida"], ingredient["nombre"]]
                 self.ingredient_list.insert('', tk.END, values=data)
 
     def new_ingredient(self) -> None: 
@@ -167,7 +165,7 @@ class NewRecipe(ttk.Frame):
         method_tree.column(0, anchor=tk.CENTER, stretch=tk.NO, width=40)
         # PASO
         method_tree.heading('Paso', text='Paso')
-        method_tree.column(1, anchor=tk.CENTER)
+        method_tree.column(1)
         
         return method_tree
 
