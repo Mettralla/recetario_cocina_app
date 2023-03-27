@@ -118,15 +118,23 @@ python main.py
 
 
 - Ventana Principal
+
 ![App Screenshot](https://drive.google.com/uc?export=view&id=1EQMfyEnTBAVv_2S9p819i3daVu2uNfUT)
+<br>
 
 - Ventana Agregar Receta
+<br>
+
 ![App Screenshot](https://drive.google.com/uc?export=view&id=1lPLi8Iu2l4V33RcDV900WpURVBbzx3JS)
 
 - Ventana Editar Receta
+<br>
+
 ![App Screenshot](https://drive.google.com/uc?export=view&id=1HeO9ecogyfXjUoVZsd8tpEZt8MGsmBGE)
 
 - Ventana Ver Receta
+<br>
+
 ![App Screenshot](https://drive.google.com/uc?export=view&id=1BkQi30wDJ-kj1drPEkVBkZl206x4LflN)
 
 ## ⛏️ Tecnologias <a name = "tech_stack"></a>
