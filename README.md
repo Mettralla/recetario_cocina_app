@@ -21,7 +21,7 @@
 
 
 ## 🧐 Consigna <a name = "problem_statement"></a>
----
+
 Para este proyecto se deberá diseñar una aplicación de escritorio en la que puedan crear, editar y eliminar recetas.
 
 Todos los incisos que tienen el símbolo '✅' son obligatorios, mientras que aquellos que tienen el símbolo '⭐' son opcionales.
@@ -67,7 +67,7 @@ Debe contar con las siguientes vistas:
 
 
 ## 💡 Resolucion <a name = "idea"></a>
----
+
 
 Estructura del proyecto:
 
@@ -95,7 +95,6 @@ Estructura del proyecto:
     └── README.md
 
 ## 🏁 Instalación/Ejecución <a name = "getting_started"></a>
----
 
 Clonar el repositorio
 
@@ -116,7 +115,7 @@ python main.py
 ```
 
 ## 🎈 Vista Previa <a name="usage"></a>
----
+
 
 - Ventana Principal
 ![App Screenshot](https://drive.google.com/uc?export=view&id=1EQMfyEnTBAVv_2S9p819i3daVu2uNfUT)
@@ -131,7 +130,7 @@ python main.py
 ![App Screenshot](https://drive.google.com/uc?export=view&id=1BkQi30wDJ-kj1drPEkVBkZl206x4LflN)
 
 ## ⛏️ Tecnologias <a name = "tech_stack"></a>
----
+
 - [Python 3.10.0](https://www.python.org) - Lenguaje
 - Librerias usadas:
     - [Tkinter](https://docs.python.org/es/3/library/tkinter.html) - Interface de Python para Tcl/Tk
@@ -142,5 +141,4 @@ python main.py
     - [PIL](https://github.com/python-pillow/Pillow/) - Python Imaging Library
 
 ## ✍️ Autor <a name = "authors"></a>
----
 - Daniel Tejerina ([@mettralla](https://github.com/mettralla)) - [Linkedin](https://www.linkedin.com/in/daniel-alejandro-tejerina/)
