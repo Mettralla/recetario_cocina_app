@@ -21,17 +21,15 @@ class App(ttk.Frame):
         parent.geometry('1280x720')
         parent.title('Kitchen App')
         parent.resizable(0, 0)
-        # parent.config(bg='#000000')
-        # self.style = ttk.Style()
-        # self.style.theme_use('alt')
+        parent.config(bg='#d9d9d9')
+        self.style = ttk.Style()
+        self.style.theme_use('clam')
 
         # Add the rowheight
-        # self.style.configure('Treeview', rowheight=30)
-        # self.style.configure('Label', background='green')
+        self.style.configure('Treeview', rowheight=30)
 
         # BUTTONS
         self.set_ui()
-        self.new_day()
 
         # DATA LIST
         self.tree = self.create_tree()

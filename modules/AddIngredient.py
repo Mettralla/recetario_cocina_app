@@ -10,8 +10,9 @@ class AddIngredient(ttk.Frame):
         self.parent = parent
 
         parent.title('Ingredientes')
-        parent.geometry('250x120')
+        parent.geometry('250x140')
         parent.resizable(0, 0)
+        parent.config(bg='#d9d9d9')
 
         # NOMBRE DEL INGREDIENTE
         self.ingrediente = tk.StringVar()

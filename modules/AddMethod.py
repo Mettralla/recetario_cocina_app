@@ -15,6 +15,7 @@ class AddMethod(ttk.Frame):
         parent.geometry('500x120')
         # DESACTIVA EL CAMBIO DE TAMAÑO
         parent.resizable(0, 0)
+        parent.config(bg='#d9d9d9')
 
         # GUARDA EL PASO DE PREPARACION
         self.cooking_method = tk.StringVar()

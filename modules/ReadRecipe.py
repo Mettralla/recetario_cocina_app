@@ -16,7 +16,8 @@ class ReadRecipe(ttk.Frame):
             Image.open('images\empty_star.png').resize((30, 30)))
         
         parent.title(title)
-        parent.geometry('580x650')
+        parent.geometry('600x720')
+        parent.config(bg='#d9d9d9')
         parent.resizable(0, 0)
 
         # COLUMNS
@@ -106,7 +107,7 @@ class ReadRecipe(ttk.Frame):
         ttk.Label(self.parent, text=f"Tiempo de Cocción: {self.recipe['tiempo de coccion']}", padding=3).grid(
             row=5, column=3, columnspan=3, sticky=tk.EW)
         
-        ttk.Label(self.parent, text=f"Etiquetas: {self.recipe['etiquetas']}").grid(
+        ttk.Label(self.parent, text=f"Etiquetas: {self.recipe['etiquetas']}", padding=3).grid(
             row=6, column=1, columnspan=5, sticky=tk.EW)
         
         # BOTON

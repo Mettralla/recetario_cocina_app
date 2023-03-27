@@ -13,7 +13,8 @@ class NewRecipe(ttk.Frame):
         self.image = None
 
         parent.title(title)
-        parent.geometry('580x650')
+        parent.geometry('600x720')
+        parent.config(bg='#d9d9d9')
         parent.resizable(0, 0)
 
         # COLUMNS
