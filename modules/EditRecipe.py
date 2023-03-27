@@ -181,9 +181,14 @@ class EditRecipe(ttk.Frame):
         '''Carga los ingredientes de la lista en el Treeview'''
         ingredients = self.recipe['ingredientes'].split(',')
         amounts = self.recipe['cantidades'].split(',')
-        for ingredient, amount in zip(ingredients, amounts):
-            self.ingredient_list.insert(
-                '', tk.END, values=[amount, ingredient])
+        if '' in ingredients:
+            ingredients.remove('')
+            amounts.remove('')
+        for index, _  in enumerate(ingredients, 0):
+            if ingredients != '':
+                self.ingredient_list.insert(
+                    '', tk.END, values=[amounts[index], ingredients[index]])
+                index += 1
 
     def new_ingredient(self) -> None:
         '''Abre una ventana para agregar un ingrediente'''
@@ -206,6 +211,8 @@ class EditRecipe(ttk.Frame):
         amts.append(new_ingredient.get_amount())
         self.recipe['ingredientes'] = self.list_to_str(ing)
         self.recipe['cantidades'] = self.list_to_str(amts)
+        print(self.recipe['cantidades'])
+        print(self.recipe['ingredientes'])
 
     def refresh_ingredient_tree(self) -> None:
         '''Actualiza la lista de ingredientes'''
@@ -220,14 +227,17 @@ class EditRecipe(ttk.Frame):
     def delete_ingredient(self) -> None:
         '''Elimina el ultimo ingrediente de la lista de ingredientes'''
         try:
-            ingredients = self.recipe['ingredientes'].split(',')
-            amounts = self.recipe['cantidades'].split(',')
-            ingredients.pop(-1)
-            amounts.pop(-1)
-            self.recipe['ingredientes'] = self.list_to_str(ingredients)
-            self.recipe['cantidades'] = self.list_to_str(amounts)
-            self.ingredient_list = self.create_ingredient_list()
-            self.load_ingredients()
+            if self.recipe['ingredientes'] != '':
+                ingredients = self.recipe['ingredientes'].split(',')
+                amounts = self.recipe['cantidades'].split(',')
+                ingredients.pop(-1)
+                amounts.pop(-1)
+                self.recipe['ingredientes'] = self.list_to_str(ingredients)
+                self.recipe['cantidades'] = self.list_to_str(amounts)
+                self.ingredient_list = self.create_ingredient_list()
+                self.load_ingredients()
+            else:
+                raise IndexError
         except IndexError:
             msg.showerror(message='No hay ningun ingrediente en la lista',
                           title='Eliminar ingrediente', parent=self.parent)
@@ -244,12 +254,18 @@ class EditRecipe(ttk.Frame):
 
     def list_to_str(self, f_list:list) -> str:
         '''Transforma la lista de ingredientes en string y la devuelve'''
-        str_list = ''
-        for item in f_list:
-            str_list += item
-            if f_list[-1] != item:
-                str_list += ','
-        return str_list
+        if f_list:
+            str_list = ''
+            for item in f_list:
+                str_list = str_list + item + ','
+            string_list = str_list[:-1]
+            if string_list[0] == ',':
+                string_list = str_list[1:]
+                return string_list
+            else:
+                return string_list
+        else: 
+            return ''
 
     # PASOS DE PREPARACION
     def create_method_list(self) -> ttk.Treeview:
@@ -268,17 +284,18 @@ class EditRecipe(ttk.Frame):
         method_tree.column(0, anchor=tk.CENTER, stretch=tk.NO, width=40)
         # PASO
         method_tree.heading('Paso', text='Paso')
-        method_tree.column(1)
 
         return method_tree
 
     def load_method_list(self) -> None:
         '''Carga los ingredientes de la lista en el Treeview'''
         prep_methods = self.recipe['preparacion'].split(',')
-        for id, prep_method in enumerate(prep_methods, 1):
-            self.method_list.insert(
-                '', tk.END, values=[id, prep_method]
-            )
+        id = 1
+        for prep_method in prep_methods:
+            if prep_method != '':
+                self.method_list.insert(
+                        '', tk.END, values=[id, prep_method])
+                id += 1
 
     def new_method(self) -> None:
         '''Abre una ventana para agregar paso de preparacion'''
@@ -308,16 +325,16 @@ class EditRecipe(ttk.Frame):
     def delete_method(self) -> None:
         '''Elimina el ultimo elemento de la lista de preparacion'''
         try:
-            prep = self.recipe['preparacion'].split(',')
-            if len(prep) > 0:
+            if self.recipe['preparacion'] != '':
+                prep = self.recipe['preparacion'].split(',')
                 prep.pop(-1)
+                self.recipe['preparacion'] = self.list_to_str(prep)
+                self.method_list = self.create_method_list()
+                self.load_method_list()
             else:
                 raise IndexError
-            self.recipe['preparacion'] = self.list_to_str(prep)
-            self.method_list = self.create_method_list()
-            self.load_method_list()
         except IndexError:
-            msg.showerror(message='No hay ningun method en la lista',
+            msg.showerror(message='No hay ningun paso en la lista',
                           title='Eliminar ingrediente', parent=self.parent)
 
     def add_image(self) -> None:
