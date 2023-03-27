@@ -51,7 +51,7 @@ class App(ttk.Frame):
         parent.rowconfigure(4, weight=7)
         parent.rowconfigure(5, weight=7)
 
-    def set_ui(self) -> ttk.Button:
+    def set_ui(self) -> None:
         '''Crea los botones y los ubica en la grilla'''
 
         # BUTTONS - CRUD + REFRESH

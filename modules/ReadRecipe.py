@@ -69,7 +69,7 @@ class ReadRecipe(ttk.Frame):
                 except ValueError:
                         pass
         return selected_recipe
-    
+
     def create_ui(self) -> None:
         '''Muestra la receta'''
         # TITULO
@@ -113,7 +113,7 @@ class ReadRecipe(ttk.Frame):
         # BOTON
         ttk.Button(self.parent, text="Cerrar", command=self.parent.destroy).grid(
             row=7, column=1, columnspan=5, sticky=tk.NSEW, padx=5, pady=5)
-        
+
     def create_ingredient_list(self) -> ttk.Treeview:
         '''Crea el treeview widget que contendra los ingredientes'''
         # Numero de columnas y nombres
@@ -131,7 +131,7 @@ class ReadRecipe(ttk.Frame):
         ingredient_tree.column(1)
 
         return ingredient_tree
-        
+
     def load_ingredients(self) -> None:
         '''Carga los ingredientes de la lista en el Treeview'''
         ingredients = self.recipe['ingredientes'].split(',')
@@ -157,7 +157,7 @@ class ReadRecipe(ttk.Frame):
         method_tree.heading('Pasos', text='Pasos')
 
         return method_tree
-    
+
     def load_method_list(self) -> None:
         '''Carga los pasos de preparacion en la lista'''
         prep_methods = self.recipe['preparacion'].split(',')

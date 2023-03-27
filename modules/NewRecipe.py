@@ -186,7 +186,7 @@ class NewRecipe(ttk.Frame):
         '''Actualiza la lista de pasos de preparacion'''
         self.method_list = self.create_method_list()
         self.read_method_list()
-    
+
     def get_last_recipe_id(self) -> int:
         '''Obtiene el id del ultimo item de la lista de recetas y lo regresa, si no existe devuelve 0'''
         with open(RECIPE_LIST, newline="\n") as csvfile:
@@ -202,7 +202,7 @@ class NewRecipe(ttk.Frame):
                 return last_id
             else:
                 return 0
-    
+
     def get_recipe_ingredients(self) -> list[Ingredient]:
         '''Lee el fichero de ingredientes y los convierte en objetos Ingredientes. Devuelve una lista de objetos.'''
         f_ingredients = []
@@ -217,7 +217,7 @@ class NewRecipe(ttk.Frame):
                 f_ingredients.append(new_ingredient)
         self.reset_file(INGREDIENT_LIST, ["nombre", "cantidad", "medida"])
         return f_ingredients
-    
+
     def get_recipe_methods(self) -> list:
         '''Lee la lista de pasos de preparacion y lo formatea para agregar a la receta'''
         f_methods = []
@@ -227,7 +227,7 @@ class NewRecipe(ttk.Frame):
                 f_methods.append(prep_method['paso'])
         self.reset_file(METHOD_LIST, ["id", "paso"])
         return f_methods
-    
+
     def get_recipe(self) -> dict[str]:
         '''Toma los valores ingresados y los convierte en un objeto Receta, regresa los datos formateados en un diccionario de strings'''
         new_recipe = Recipe(
@@ -242,7 +242,7 @@ class NewRecipe(ttk.Frame):
             favorite= self.favorite.get()
         )
         return new_recipe.format_values()
-    
+
     def reset_file(self, route: str, fieldlist: list[str]) -> None:
         '''Elimina los items de las lista temporales dejando solo los encabezados.
             params:

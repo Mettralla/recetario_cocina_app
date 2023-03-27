@@ -9,7 +9,6 @@ import itertools
 import shutil
 import os
 
-
 class EditRecipe(ttk.Frame):
     def __init__(self, parent, title: str, recipe_id: int) -> None:
         super().__init__(parent, padding=(20))
@@ -27,7 +26,6 @@ class EditRecipe(ttk.Frame):
         parent.geometry('600x720')
         parent.config(bg='#d9d9d9')
         parent.resizable(0, 0)
-        # parent.geometry('580x650')
 
         # COLUMNS
         parent.columnconfigure(0, weight=1)
@@ -80,7 +78,6 @@ class EditRecipe(ttk.Frame):
                     pass
         return selected_recipe
 
-
     def create_ui(self) -> None:
         '''Crea la interfaz que usara el usuario para crear la receta'''
         # NOMBRE DE LA RECETA
@@ -127,13 +124,13 @@ class EditRecipe(ttk.Frame):
         ttk.Entry(self.parent, textvariable=self.cooking_time, justify=tk.RIGHT).grid(
             row=5, column=5, sticky=tk.EW)
         
-        # Tags
+        # TAGS
         ttk.Label(self.parent, text="Etiquetas:", padding=3).grid(
             row=6, column=1, sticky=tk.EW)
         ttk.Entry(self.parent, textvariable=self.tags, justify=tk.RIGHT).grid(
             row=6, column=2, sticky=tk.EW)
 
-        # Fav
+        # FAV
         ttk.Label(self.parent, text="Favorita:", padding=3).grid(
             row=6, column=4, sticky=tk.EW)
         ttk.Combobox(self.parent, textvariable=self.favorite, values=[
@@ -287,7 +284,7 @@ class EditRecipe(ttk.Frame):
         '''Abre una ventana para agregar paso de preparacion'''
         toplevel = tk.Toplevel(self.parent)
         AddMethod(toplevel).grid()
-        
+
     def add_method_to_dict(self) -> None:
         '''Agrega la ingrediente al diccionario de la receta que se esta editando'''
         prep = self.recipe['preparacion'].split(',')
@@ -296,8 +293,7 @@ class EditRecipe(ttk.Frame):
             for prep_method in reader:
                 prep.append(prep_method['paso'])
         self.recipe['preparacion'] = self.list_to_str(prep)
-        print(prep)
-        
+
     def refresh_method_tree(self) -> None:
         '''Actualiza la lista de preparacion'''
         try:
@@ -313,12 +309,15 @@ class EditRecipe(ttk.Frame):
         '''Elimina el ultimo elemento de la lista de preparacion'''
         try:
             prep = self.recipe['preparacion'].split(',')
-            prep.pop(-1)
+            if len(prep) > 0:
+                prep.pop(-1)
+            else:
+                raise IndexError
             self.recipe['preparacion'] = self.list_to_str(prep)
             self.method_list = self.create_method_list()
             self.load_method_list()
         except IndexError:
-            msg.showerror(message='No hay ningun ingrediente en la lista',
+            msg.showerror(message='No hay ningun method en la lista',
                           title='Eliminar ingrediente', parent=self.parent)
 
     def add_image(self) -> None:
