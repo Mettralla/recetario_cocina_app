@@ -345,6 +345,7 @@ class EditRecipe(ttk.Frame):
             )
 
     def delete_image(self) -> None:
+        '''Elimina la receta si la encuentra'''
         if self.recipe['imagen'] == 'None':
             msg.showinfo(title='Borrar imagen', message='Esta receta no tiene imagen', parent=self.parent)
         else:

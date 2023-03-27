@@ -294,6 +294,7 @@ class App(ttk.Frame):
         self.read_search_data(found_recipes)
 
     def new_recipe_otd_id(self) -> int:
+        '''Lee las recetas las ingresa a una lista y escoge una al azar y devuelve el id'''
         fieldlist = ["id", "nombre", "ingredientes", "cantidades", "preparacion",
                      "tiempo de preparacion", "tiempo de coccion", "creado", "imagen", "etiquetas", "favorito"]
         ids = []
@@ -306,6 +307,7 @@ class App(ttk.Frame):
         return ids[rand_recipe]
 
     def save_recipe_otd(self) -> None:
+        '''Escribe la receta del dia en el fichero, cuyo parametros es el id y la fecha'''
         fieldlist = ["id", "dia"]
         with open(RECIPE_OF_THE_DAY, "w", newline="\n") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldlist)
@@ -313,6 +315,9 @@ class App(ttk.Frame):
             writer.writerow({'id': self.new_recipe_otd_id(), 'dia': datetime.now().strftime("%Y,%m,%d")})
 
     def read_recipe_otd(self) -> list:
+        '''Lee el fichero de la receta del dia y devuelve una lista con los parametros:
+            (int) id: el id de la receta del dia
+            (str) dia: fecha en formato YYYY,MM,DD'''
         recipe_otd = []
         fieldlist = ["id", "dia"]
         with open(RECIPE_OF_THE_DAY,  "r", newline="\n") as csvfile:
@@ -324,6 +329,7 @@ class App(ttk.Frame):
         return recipe_otd
 
     def count_recipes(self) -> int:
+        '''Cuenta la cantidad de recetas en la lista de recetas'''
         count = 0
         with open(RECIPE_LIST,  "r", newline="\n") as csvfile:
             reader = csv.reader(csvfile)
@@ -332,14 +338,15 @@ class App(ttk.Frame):
         return count
     
     def new_day(self):
+        '''Chequea si han pasado un dia desde que se asigno la receta del dia'''
         recipe_otd = self.read_recipe_otd()
         rotd_to_list = recipe_otd[1].split(',')
         rotd_day = datetime(int(rotd_to_list[0]), int(rotd_to_list[1]), int(rotd_to_list[2]))
         delta = datetime.now() - rotd_day
         return True if delta.days != 0 else False
 
-    def get_recipe_otd(self) -> dict:
-        '''Lee el fichero, identifica la receta a traves del id y la convierte en un diccionario lista para ser mostrada'''
+    def get_recipe_otd(self) -> list[str]:
+        '''Recibe el id de la receta del dia, busca el id en la lista y devuelve una lista formateada para ser agregada al Treeview'''
         recipe_otd_data = self.read_recipe_otd()
         with open(RECIPE_LIST, "r", newline="\n") as csvfile:
             reader = csv.DictReader(csvfile)
