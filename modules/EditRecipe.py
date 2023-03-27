@@ -211,8 +211,6 @@ class EditRecipe(ttk.Frame):
         amts.append(new_ingredient.get_amount())
         self.recipe['ingredientes'] = self.list_to_str(ing)
         self.recipe['cantidades'] = self.list_to_str(amts)
-        print(self.recipe['cantidades'])
-        print(self.recipe['ingredientes'])
 
     def refresh_ingredient_tree(self) -> None:
         '''Actualiza la lista de ingredientes'''
