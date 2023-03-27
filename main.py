@@ -80,7 +80,6 @@ class App(ttk.Frame):
         ttk.Button(self.parent, text="Reset", command=self.refresh_recipe_tree).grid(
             row=0, column=4, padx=10, pady=5, sticky=(tk.NSEW))
 
-
     def create_tree(self) -> ttk.Treeview:
         '''Crea el treeview widget que contendra las recipes'''
 
@@ -117,7 +116,6 @@ class App(ttk.Frame):
         scrollbar.grid(row=1, column=5, sticky=tk.NS, pady=10, rowspan=5)
 
         return tree
-
 
     def read_data(self) -> None:
         '''Lee el fichero csv e inserta los datos en el treeview'''
@@ -198,7 +196,7 @@ class App(ttk.Frame):
         except IndexError:
             msg.showerror(
                 message='No ha seleccionado ningun item, haga click sobre un item y presione el boton.', title='Ver Receta', parent=self.parent)
-        
+
     def refresh_recipe_tree(self) -> None:
         '''Actualiza la lista de recetas'''
         self.tree = self.create_tree()
@@ -238,7 +236,6 @@ class App(ttk.Frame):
             msg.showwarning(
                 title='Buscar', message='No se ha encontrado coincidencias', parent=self.parent)
 
-            
     def search_by_name(self, fieldlist: list[str], name: str) -> None:
         '''Busca las recetas por nombre.
             params:
