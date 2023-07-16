@@ -2,44 +2,21 @@ import tkinter as tk
 from tkinter import ttk
 import csv
 from modules.globalVar import RECIPE_LIST
+from src.windows.IBaseWindow import *
 from PIL import ImageTk, Image
 
-class ReadRecipe(ttk.Frame):
+class ReadRecipe(ttk.Frame, IBaseWindow):
     def __init__(self, parent, title: str, recipe_id: str) -> None:
-        super().__init__(parent, padding=(20))
-        self.parent = parent
+        ttk.Frame.__init__(self, parent, padding=(20))
+        IBaseWindow.__init__(self, parent, title)
+
         self.id = recipe_id
         self.recipe = self.get_recipe()
         self.star = ImageTk.PhotoImage(
             Image.open('images\star.png').resize((30, 30)))
         self.empty_star = ImageTk.PhotoImage(
             Image.open('images\empty_star.png').resize((30, 30)))
-        
-        parent.title(title)
-        parent.geometry('600x720')
-        parent.config(bg='#d9d9d9')
-        parent.resizable(0, 0)
 
-        # COLUMNS
-        parent.columnconfigure(0, weight=1)
-        parent.columnconfigure(1, weight=1)
-        parent.columnconfigure(2, weight=1)
-        parent.columnconfigure(3, weight=1)
-        parent.columnconfigure(4, weight=1)
-        parent.columnconfigure(5, weight=1)
-        parent.columnconfigure(6, weight=1)
-
-        # ROWS
-        parent.rowconfigure(0, weight=1)  # Name
-        parent.rowconfigure(1, weight=1)  # Ingredients
-        parent.rowconfigure(2, weight=2)  # Ingred list
-        parent.rowconfigure(3, weight=1)  # Prep
-        parent.rowconfigure(4, weight=2)  # Prep list
-        parent.rowconfigure(5, weight=1)  # Time prep
-        parent.rowconfigure(6, weight=1)  # time cocc
-        parent.rowconfigure(7, weight=1)  # time cocc
-        # parent.rowconfigure(8, weight=1)  # buttons
-        
         self.create_ui()
 
 
@@ -90,13 +67,13 @@ class ReadRecipe(ttk.Frame):
         # LISTA DE INGREDIENTES
         ttk.Label(self.parent, text="Ingredientes:", padding=3).grid(
             row=1, column=1, sticky=tk.EW)
-        self.ingredient_list = self.create_ingredient_list()
+        self.ingredient_list = self.create_treeview(2, 1, 1, ('Cantidad', 'Ingredientes'))
         self.load_ingredients()
         
         # LISTA DE PASOS DE PREPARACION
         ttk.Label(self.parent, text="Preparacion:", padding=3).grid(
             row=3, column=1, sticky=tk.EW)
-        self.method_list = self.create_method_list()
+        self.method_list = self.create_treeview(4, 1, 0, ('Id', 'Pasos'))
         self.load_method_list()
         
         # TIEMPO DE PREPARACION
@@ -114,24 +91,6 @@ class ReadRecipe(ttk.Frame):
         ttk.Button(self.parent, text="Cerrar", command=self.parent.destroy).grid(
             row=7, column=1, columnspan=5, sticky=tk.NSEW, padx=5, pady=5)
 
-    def create_ingredient_list(self) -> ttk.Treeview:
-        '''Crea el treeview widget que contendra los ingredientes'''
-        # Numero de columnas y nombres
-        columns = ('Cantidad', 'Ingredientes')
-        # Crea el widget
-        ingredient_tree = ttk.Treeview(
-            self.parent, columns=columns, show='headings', height=5)
-        # Lo ubica en la grilla
-        ingredient_tree.grid(row=2, column=1, sticky=(
-            tk.NSEW), padx=5, columnspan=5)
-        # Se agregan los encabezados
-        ingredient_tree.heading('Cantidad', text='Cantidad')
-        ingredient_tree.column(0, anchor=tk.CENTER, stretch=tk.NO, width=120)
-        ingredient_tree.heading('Ingredientes', text='Ingredientes')
-        ingredient_tree.column(1)
-
-        return ingredient_tree
-
     def load_ingredients(self) -> None:
         '''Carga los ingredientes de la lista en el Treeview'''
         ingredients = self.recipe['ingredientes'].split(',')
@@ -139,24 +98,6 @@ class ReadRecipe(ttk.Frame):
         for i in range(len(ingredients)):
             self.ingredient_list.insert(
                 '', tk.END, values=[amounts[i], ingredients[i]])
-
-    def create_method_list(self) -> ttk.Treeview:
-        '''Crea el treeview widget que contendra los pasos de preparacion'''
-        # Numero de columnas y nombres
-        columns = ('Id', 'Pasos')
-        # Crea el widget
-        method_tree = ttk.Treeview(self.parent, columns=columns,
-                                   show='headings', height=5)
-        # Lo ubica en la grilla
-        method_tree.grid(row=4, column=1, sticky=(
-            tk.NSEW), padx=5, columnspan=5)
-        # Se agregan los encabezados
-        method_tree.heading('Id', text='Id')
-        method_tree.column(0, anchor=tk.CENTER, stretch=tk.NO, width=40)
-        
-        method_tree.heading('Pasos', text='Pasos')
-
-        return method_tree
 
     def load_method_list(self) -> None:
         '''Carga los pasos de preparacion en la lista'''

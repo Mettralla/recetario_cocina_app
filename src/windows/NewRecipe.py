@@ -1,136 +1,40 @@
-from modules.AddIngredient import *
-from modules.AddMethod import *
+from src.windows.AddIngredient import *
+from src.windows.AddMethod import *
 from modules.globalVar import METHOD_LIST, INGREDIENT_LIST, RECIPE_LIST
-from modules.Ingredient import Ingredient
-from modules.Recipe import Recipe
+from src.windows.IBaseWindow import *
+from src.Ingredient import Ingredient
+from src.Recipe import Recipe
 from tkinter import filedialog as fd
 from tkinter import messagebox as msg
 
-class NewRecipe(ttk.Frame):
+class NewRecipe(ttk.Frame, IBaseWindow):
     def __init__(self, parent, title: str) -> None:
-        super().__init__(parent, padding=(20))
-        self.parent = parent
+        ttk.Frame.__init__(self, parent, padding=(20))
+        IBaseWindow.__init__(self, parent, title)
+
+        self.name = tk.StringVar()
+        self.preparation_time = tk.IntVar()
+        self.cooking_time = tk.IntVar()
+        self.tags = tk.StringVar()
+        self.favorite = tk.StringVar()
         self.image = None
 
-        parent.title(title)
-        parent.geometry('600x720')
-        parent.config(bg='#d9d9d9')
-        parent.resizable(0, 0)
-
-        # COLUMNS
-        parent.columnconfigure(0, weight=1)
-        parent.columnconfigure(1, weight=1)
-        parent.columnconfigure(2, weight=1)
-        parent.columnconfigure(3, weight=1)
-        parent.columnconfigure(4, weight=1)
-        parent.columnconfigure(5, weight=1)
-        parent.columnconfigure(6, weight=1)
-
-        # ROWS
-        parent.rowconfigure(0, weight=1)  # Name
-        parent.rowconfigure(1, weight=1)  # Ingredients
-        parent.rowconfigure(2, weight=2)  # Ingred list
-        parent.rowconfigure(3, weight=1)  # Prep
-        parent.rowconfigure(4, weight=2)  # Prep list
-        parent.rowconfigure(5, weight=1)  # Time prep
-        parent.rowconfigure(6, weight=1)  # time cocc
-        parent.rowconfigure(7, weight=1)  # time cocc
+        # AGREGAR LOS BOTONES
         parent.rowconfigure(8, weight=1)  # buttons
 
         self.create_ui()
 
     def create_ui(self) -> None:
         '''Crea la interfaz que usara el usuario para crear la receta'''
-        self.name = tk.StringVar()
-        self.preparation_time = tk.IntVar()
-        self.cooking_time = tk.IntVar()
-        self.tags = tk.StringVar()
-        self.favorite = tk.StringVar()
-
-        # NOMBRE DE LA RECETA
-        ttk.Label(self.parent, text="Nombre:", padding=3).grid(
-            row=0, column=1, sticky=tk.EW)
-        ttk.Entry(self.parent, textvariable=self.name, justify=tk.RIGHT).grid(
-            row=0, column=2, columnspan=4, sticky=tk.EW)
-
-        # INGREDIENTES DE LA RECETA
-        ttk.Label(self.parent, text="Ingredientes:", padding=3).grid(
-            row=1, column=1, sticky=tk.EW)
-        ttk.Button(self.parent, text="Agregar Ingrediente", command=self.new_ingredient).grid(
-            row=1, column=2, columnspan=2, sticky=tk.EW, padx=5)
-        ttk.Button(self.parent, text="Eliminar Ingrediente", command=self.delete_ingredient).grid(row=1, column=4, sticky=tk.EW, padx=5)
-        ttk.Button(self.parent, text="Actualizar", command=self.refresh_ingredient_tree).grid(
-            row=1, column=5, sticky=tk.EW, padx=5)
-        # LISTA DE INGREDIENTES
-        self.ingredient_list = self.create_ingredient_list()
-        self.read_ingredient_list()
-        
-        # PASOS DE LA RECETA
-        ttk.Label(self.parent, text="Preparacion:", padding=3).grid(
-            row=3, column=1, sticky=tk.EW)
-        ttk.Button(self.parent, text="Agregar Paso", command=self.new_method).grid(
-            row=3, column=2, columnspan=2, sticky=tk.EW, padx=5)
-        ttk.Button(self.parent, text="Eliminar Paso", command=self.delete_method).grid(
-            row=3, column=4, sticky=tk.EW, padx=5)
-        ttk.Button(self.parent, text="Actualizar", command=self.refresh_method_tree).grid(
-            row=3, column=5, sticky=tk.EW, padx=5)
-        # LISTA DE INGREDIENTES
-        self.method_list = self.create_method_list()
-        self.read_method_list()
-        
-        # TIEMPO DE PREPARACION
-        ttk.Label(self.parent, text="Tiempo de Preparacion:", padding=3).grid(
-            row=5, column=1, sticky=tk.EW)
-        ttk.Entry(self.parent, textvariable=self.preparation_time, justify= tk.RIGHT).grid(
-            row=5, column=2, sticky=tk.EW)
-        
-        # TIEMPO DE COCCION
-        ttk.Label(self.parent, text="Tiempo de Cocción:", padding=3).grid(
-            row=5, column=4,sticky=tk.EW)
-        ttk.Entry(self.parent, textvariable=self.cooking_time, justify= tk.RIGHT).grid(
-            row=5, column=5, sticky=tk.EW)
-        
-        # Tags
-        ttk.Label(self.parent, text="Etiquetas:", padding=3).grid(
-            row=6, column=1, sticky=tk.EW)
-        ttk.Entry(self.parent, textvariable=self.tags, justify=tk.RIGHT).grid(
-            row=6, column=2, sticky=tk.EW)
-        
-        # Fav
-        ttk.Label(self.parent, text="Favorita:", padding=3).grid(
-            row=6, column=4, sticky=tk.EW)
-        ttk.Combobox(self.parent, textvariable=self.favorite, values=['Si', 'No']).grid(row=6, column=5, sticky=tk.EW)
-        
         # IMAGEN
         ttk.Label(self.parent, text="Imagen:", padding=3).grid(
             row=7, column=1, columnspan=1, sticky=tk.EW)
         ttk.Button(self.parent, text="Agregar", command=self.add_image).grid(
             row=7, column=2, columnspan=4, sticky=tk.EW)
-        
-        # BOTONERA
-        ttk.Button(self.parent, text="Crear", command=self.save).grid(row=8, column=1, columnspan=2, sticky=tk.NSEW, padx=5, pady=5)
-        ttk.Button(self.parent, text="Cancelar", command=self.parent.destroy).grid(row=8, column=3, columnspan=3, sticky=tk.NSEW, padx=5, pady=5)
 
-    # FUNCIONES DE INGREDIENTE
-    def create_ingredient_list(self) -> ttk.Treeview:
-        '''Crea el treeview widget que contendra los ingredientes'''
-        # Numero de columnas y nombres
-        columns = ('Cantidad', 'Ingredientes')
-        # Crea el widget
-        ingredient_tree = ttk.Treeview(
-            self.parent, columns=columns, show='headings', height=5)
-        # Lo ubica en la grilla
-        ingredient_tree.grid(row=2, column=1, sticky=(
-            tk.NSEW), padx=5, columnspan=5)
-        # Se agregan los encabezados
-        ingredient_tree.heading('Cantidad', text='Cantidad')
-        ingredient_tree.column(0, anchor=tk.CENTER, stretch=tk.NO, width=120)
-        ingredient_tree.heading('Ingredientes', text='Ingredientes')
-        ingredient_tree.column(1)
+        self.base_ui_config('Crear')
 
-        return ingredient_tree
-    
-    def read_ingredient_list(self) -> None:
+    def load_ingredients(self) -> None:
         '''Lee el los ingredientes de la lista de ingredientes y los muestra'''
         with open(INGREDIENT_LIST, newline="\n") as csvfile:
             reader = csv.DictReader(csvfile)
@@ -146,30 +50,10 @@ class NewRecipe(ttk.Frame):
 
     def refresh_ingredient_tree(self) -> None:
         '''Actualiza la lista de ingredientes'''
-        self.ingredient_list = self.create_ingredient_list()
-        self.read_ingredient_list()
+        self.ingredient_list = self.create_treeview(2, 1, 1, ('Cantidad', 'Ingredientes'))
+        self.load_ingredients()
 
-    # FUNCIONES DE PASOS
-    def create_method_list(self) -> ttk.Treeview:
-        '''Crea el treeview widget que contendra los pasos de preparacion'''
-        # Numero de columnas y nombres
-        columns = ('Id', 'Paso')
-        # Crea el widget
-        method_tree = ttk.Treeview(self.parent, columns=columns,
-                            show='headings', height=5)
-        # Lo ubica en la grilla
-        method_tree.grid(row=4, column=1, sticky=(tk.NSEW), padx=5, columnspan=5)
-        # Se agregan los encabezados
-        # ID
-        method_tree.heading('Id', text='Id')
-        method_tree.column(0, anchor=tk.CENTER, stretch=tk.NO, width=40)
-        # PASO
-        method_tree.heading('Paso', text='Paso')
-        method_tree.column(1)
-        
-        return method_tree
-
-    def read_method_list(self) -> None:
+    def load_prep_methods(self) -> None:
         '''Lee los pasos de preparacion de la lista de pasos y los muestra'''
         with open(METHOD_LIST, newline="\n") as csvfile:
             reader = csv.DictReader(csvfile)
@@ -184,8 +68,8 @@ class NewRecipe(ttk.Frame):
 
     def refresh_method_tree(self) -> None:
         '''Actualiza la lista de pasos de preparacion'''
-        self.method_list = self.create_method_list()
-        self.read_method_list()
+        self.method_list = self.create_treeview(4, 1, 0, ('Id', 'Pasos'))
+        self.load_prep_methods()
 
     def get_last_recipe_id(self) -> int:
         '''Obtiene el id del ultimo item de la lista de recetas y lo regresa, si no existe devuelve 0'''

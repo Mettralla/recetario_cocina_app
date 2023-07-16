@@ -1,7 +1,8 @@
-from modules.AddIngredient import *
-from modules.AddMethod import *
+from src.windows.AddIngredient import *
+from src.windows.AddMethod import *
+from src.windows.IBaseWindow import *
 from modules.globalVar import METHOD_LIST, INGREDIENT_LIST, RECIPE_LIST, DESTINATION
-from modules.Ingredient import Ingredient
+from src.Ingredient import Ingredient
 import csv
 from tkinter import filedialog as fd
 from tkinter import messagebox as msg
@@ -9,10 +10,11 @@ import itertools
 import shutil
 import os
 
-class EditRecipe(ttk.Frame):
+class EditRecipe(ttk.Frame, IBaseWindow):
     def __init__(self, parent, title: str, recipe_id: int) -> None:
-        super().__init__(parent, padding=(20))
-        self.parent = parent
+        ttk.Frame.__init__(self, parent, padding=(20))
+        IBaseWindow.__init__(self, parent, title)
+
         self.id = recipe_id
         self.recipe = self.get_recipe()
 
@@ -22,29 +24,6 @@ class EditRecipe(ttk.Frame):
         self.tags = tk.StringVar()
         self.favorite = tk.StringVar()
 
-        parent.title(title)
-        parent.geometry('600x720')
-        parent.config(bg='#d9d9d9')
-        parent.resizable(0, 0)
-
-        # COLUMNS
-        parent.columnconfigure(0, weight=1)
-        parent.columnconfigure(1, weight=1)
-        parent.columnconfigure(2, weight=1)
-        parent.columnconfigure(3, weight=1)
-        parent.columnconfigure(4, weight=1)
-        parent.columnconfigure(5, weight=1)
-        parent.columnconfigure(6, weight=1)
-
-        # ROWS
-        parent.rowconfigure(0, weight=1)  # Name
-        parent.rowconfigure(1, weight=1)  # Ingredients
-        parent.rowconfigure(2, weight=2)  # Ingred list
-        parent.rowconfigure(3, weight=1)  # Prep
-        parent.rowconfigure(4, weight=2)  # Prep list
-        parent.rowconfigure(5, weight=1)  # Time prep
-        parent.rowconfigure(6, weight=1)  # time cocc
-        parent.rowconfigure(7, weight=1)  # time cocc
         parent.rowconfigure(8, weight=1)  # buttons
 
         self.create_ui()
@@ -80,62 +59,6 @@ class EditRecipe(ttk.Frame):
 
     def create_ui(self) -> None:
         '''Crea la interfaz que usara el usuario para crear la receta'''
-        # NOMBRE DE LA RECETA
-        ttk.Label(self.parent, text="Nombre:", padding=3).grid(
-            row=0, column=1, sticky=tk.EW)
-        tk.Entry(self.parent, textvariable=self.name, justify=tk.RIGHT).grid(
-            row=0, column=2, columnspan=4, sticky=tk.EW)
-
-        # INGREDIENTES DE LA RECETA
-        ttk.Label(self.parent, text="Ingredientes:", padding=3).grid(
-            row=1, column=1, sticky=tk.EW)
-        ttk.Button(self.parent, text="Agregar Ingrediente", command=self.new_ingredient).grid(
-            row=1, column=2, columnspan=2, sticky=tk.EW, padx=5)
-        ttk.Button(self.parent, text="Eliminar Ingrediente", command=self.delete_ingredient).grid(
-            row=1, column=4, sticky=tk.EW, padx=5)
-        ttk.Button(self.parent, text="Actualizar", command=self.refresh_ingredient_tree).grid(
-            row=1, column=5, sticky=tk.EW, padx=5)
-        # LISTA DE INGREDIENTES
-        self.ingredient_list = self.create_ingredient_list()
-        self.load_ingredients()
-
-        # # PASOS DE LA RECETA
-        ttk.Label(self.parent, text="Preparacion:", padding=3).grid(
-            row=3, column=1, sticky=tk.EW)
-        ttk.Button(self.parent, text="Agregar Paso", command=self.new_method).grid(
-            row=3, column=2, columnspan=2, sticky=tk.EW, padx=5)
-        ttk.Button(self.parent, text="Eliminar Paso", command=self.delete_method).grid(
-            row=3, column=4, sticky=tk.EW, padx=5)
-        ttk.Button(self.parent, text="Actualizar", command=self.refresh_method_tree).grid(
-            row=3, column=5, sticky=tk.EW, padx=5)
-        # LISTA DE PASOS
-        self.method_list = self.create_method_list()
-        self.load_method_list()
-
-        # TIEMPO DE PREPARACION
-        ttk.Label(self.parent, text="Tiempo de Preparacion:", padding=3).grid(
-            row=5, column=1, sticky=tk.EW)
-        ttk.Entry(self.parent, textvariable=self.preparation_time, justify=tk.RIGHT).grid(
-            row=5, column=2, sticky=tk.EW)
-
-        # TIEMPO DE COCCION
-        ttk.Label(self.parent, text="Tiempo de Cocción:", padding=3).grid(
-            row=5, column=4, sticky=tk.EW)
-        ttk.Entry(self.parent, textvariable=self.cooking_time, justify=tk.RIGHT).grid(
-            row=5, column=5, sticky=tk.EW)
-        
-        # TAGS
-        ttk.Label(self.parent, text="Etiquetas:", padding=3).grid(
-            row=6, column=1, sticky=tk.EW)
-        ttk.Entry(self.parent, textvariable=self.tags, justify=tk.RIGHT).grid(
-            row=6, column=2, sticky=tk.EW)
-
-        # FAV
-        ttk.Label(self.parent, text="Favorita:", padding=3).grid(
-            row=6, column=4, sticky=tk.EW)
-        ttk.Combobox(self.parent, textvariable=self.favorite, values=[
-                     'Si', 'No']).grid(row=6, column=5, sticky=tk.EW)
-
         # IMAGEN
         ttk.Label(self.parent, text="Imagen:", padding=3).grid(
             row=7, column=1, columnspan=1, sticky=tk.EW)
@@ -143,12 +66,8 @@ class EditRecipe(ttk.Frame):
             row=7, column=2, columnspan=3, sticky=tk.EW)
         ttk.Button(self.parent, text="Borrar", command=self.delete_image).grid(
             row=7, column=5, sticky=tk.EW)
-
-        # # BOTONERA
-        ttk.Button(self.parent, text="Guardar Cambios", command=self.save).grid(
-            row=8, column=1, columnspan=2, sticky=tk.NSEW, padx=5, pady=5)
-        ttk.Button(self.parent, text="Cancelar", command=self.parent.destroy).grid(
-            row=8, column=3, columnspan=3, sticky=tk.NSEW, padx=5, pady=5)
+        
+        self.base_ui_config('Guardar Cambios')
 
     def set_variables(self):
         '''Rellena automaticamente los entry con los valores actuales'''
@@ -157,25 +76,6 @@ class EditRecipe(ttk.Frame):
         self.cooking_time.set(self.recipe['tiempo de coccion'])
         self.tags.set(self.recipe['etiquetas'])
         self.favorite.set(self.recipe['favorito'])
-
-    #   INGREDIENTES
-    def create_ingredient_list(self) -> ttk.Treeview:
-        '''Crea el treeview widget que contendra los ingredientes'''
-        # Numero de columnas y nombres
-        columns = ('Cantidad', 'Ingredientes')
-        # Crea el widget
-        ingredient_tree = ttk.Treeview(
-            self.parent, columns=columns, show='headings', height=5)
-        # Lo ubica en la grilla
-        ingredient_tree.grid(row=2, column=1, sticky=(
-            tk.NSEW), padx=5, columnspan=5)
-        # Se agregan los encabezados
-        ingredient_tree.heading('Cantidad', text='Cantidad')
-        ingredient_tree.column(0, anchor=tk.CENTER, stretch=tk.NO, width=120)
-        ingredient_tree.heading('Ingredientes', text='Ingredientes')
-        ingredient_tree.column(1)
-
-        return ingredient_tree
 
     def load_ingredients(self) -> None:
         '''Carga los ingredientes de la lista en el Treeview'''
@@ -216,7 +116,7 @@ class EditRecipe(ttk.Frame):
         '''Actualiza la lista de ingredientes'''
         try:
             self.add_ingredient_to_dict()
-            self.ingredient_list = self.create_ingredient_list()
+            self.ingredient_list = self.create_treeview(2, 1, 1, ('Cantidad', 'Ingredientes'))
             self.load_ingredients()
             self.reset_file(INGREDIENT_LIST, ["nombre", "cantidad", "medida"])
         except UnboundLocalError:
@@ -232,7 +132,7 @@ class EditRecipe(ttk.Frame):
                 amounts.pop(-1)
                 self.recipe['ingredientes'] = self.list_to_str(ingredients)
                 self.recipe['cantidades'] = self.list_to_str(amounts)
-                self.ingredient_list = self.create_ingredient_list()
+                self.ingredient_list = self.create_treeview(2, 1, 1, ('Cantidad', 'Ingredientes'))
                 self.load_ingredients()
             else:
                 raise IndexError
@@ -265,27 +165,7 @@ class EditRecipe(ttk.Frame):
         else: 
             return ''
 
-    # PASOS DE PREPARACION
-    def create_method_list(self) -> ttk.Treeview:
-        '''Crea el treeview widget que contendra los pasos de preparacion'''
-        # Numero de columnas y nombres
-        columns = ('Id', 'Paso')
-        # Crea el widget
-        method_tree = ttk.Treeview(self.parent, columns=columns,
-                                   show='headings', height=5)
-        # Lo ubica en la grilla
-        method_tree.grid(row=4, column=1, sticky=(
-            tk.NSEW), padx=5, columnspan=5)
-        # Se agregan los encabezados
-        # ID
-        method_tree.heading('Id', text='Id')
-        method_tree.column(0, anchor=tk.CENTER, stretch=tk.NO, width=40)
-        # PASO
-        method_tree.heading('Paso', text='Paso')
-
-        return method_tree
-
-    def load_method_list(self) -> None:
+    def load_prep_methods(self) -> None:
         '''Carga los ingredientes de la lista en el Treeview'''
         prep_methods = self.recipe['preparacion'].split(',')
         id = 1
@@ -313,8 +193,8 @@ class EditRecipe(ttk.Frame):
         '''Actualiza la lista de preparacion'''
         try:
             self.add_method_to_dict()
-            self.method_list = self.create_method_list()
-            self.load_method_list()
+            self.method_list = self.create_treeview(4, 1, 0, ('Id', 'Pasos'))
+            self.load_prep_methods()
             self.reset_file(METHOD_LIST, ["id", "paso"])
         except UnboundLocalError:
             msg.showerror(message='No realizo ningun cambio',
@@ -327,8 +207,8 @@ class EditRecipe(ttk.Frame):
                 prep = self.recipe['preparacion'].split(',')
                 prep.pop(-1)
                 self.recipe['preparacion'] = self.list_to_str(prep)
-                self.method_list = self.create_method_list()
-                self.load_method_list()
+                self.method_list = self.create_treeview(4, 1, 0, ('Id', 'Pasos'))
+                self.load_prep_methods()
             else:
                 raise IndexError
         except IndexError:

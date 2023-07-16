@@ -2,9 +2,9 @@ import tkinter as tk
 from tkinter import ttk
 import csv
 from modules.globalVar import RECIPE_LIST, RECIPE_OF_THE_DAY
-from modules.NewRecipe import *
-from modules.ReadRecipe import ReadRecipe
-from modules.EditRecipe import EditRecipe
+from src.windows.NewRecipe import *
+from src.windows.ReadRecipe import ReadRecipe
+from src.windows.EditRecipe import EditRecipe
 import os
 from datetime import datetime
 import random

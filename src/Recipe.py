@@ -1,4 +1,4 @@
-from modules.Ingredient import Ingredient
+from src.Ingredient import Ingredient
 from datetime import datetime
 import shutil
 from modules.globalVar import DESTINATION
