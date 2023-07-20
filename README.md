@@ -70,6 +70,10 @@ Debe contar con las siguientes vistas:
 
 ## 💡 Resolucion <a name = "idea"></a>
 
+DER:
+
+![App Screenshot](der_recipe_manager.png)
+
 Estructura del proyecto:
 
     .
