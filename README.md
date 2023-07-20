@@ -5,7 +5,9 @@
 
 ---
 
-<p align="center"> Resolucion del Proyecto Integrador Final de la Catedra Programación 1 de la Carrera de Desarrollo de Software de la Universidad Provincial de Administración, Tecnologia y Oficios (UPATECO). Consiste en una aplicacion de escritorio donde puede almacenarse recetas de cocina.
+<p align="center"> Resolucion del Proyecto Integrador Final de la Catedra Programación 1 de la Carrera de Desarrollo de Software de la Universidad Provincial de Administración, Tecnologia y Oficios (UPATECO). Consiste en una aplicacion de escritorio donde puede almacenarse recetas de cocina. 
+
+En un principio se administraba a traves de CSV pero se migro a una base de datos MYSQL durante. 
     <br> 
 </p>
 
@@ -68,33 +70,43 @@ Debe contar con las siguientes vistas:
 
 ## 💡 Resolucion <a name = "idea"></a>
 
-
 Estructura del proyecto:
 
     .
-    ├── csv_files                       # Ficheros csv
-    │   ├── ingredients_temp.csv            # Lista temporal de ingredientes
-    │   ├── method_list_temp.csv            # Lista temporal de pasos
-    │   ├── recipe_of_the_day.csv           # Registro de la receta del dia
-    │   └── recipes.csv                     # Lista de recetas
     ├── images                          # Imagenes usadas en el proyecto
-    │   ├── get_destination.py              # Detecta ruta relativa del fichero
     │   ├── empty_star.png                  # Iconos de favorito
     │   └── star.png                        # Iconos de favorito
-    ├── modules                         # Modulos/Clases Auxiliares
-    │   ├── AddIngredient.py                # Ventana que agrega ingrediente
-    │   ├── AddMethod.py                    # Ventana que agrega paso
-    │   ├── EditRecipe.py                   # Ventana editar receta
-    │   ├── NewRecipe.py                    # Ventana crear receta
-    │   ├── ReadRecipe.py                   # Ventana leer receta
-    │   ├── Ingredient.py                   # Objeto Ingrediente
-    │   ├── Recipe.py                       # Objeto Receta
-    │   └── globalVar.py                    # Lista de Variables Constantes
+    ├── src                                 # Modulos/Clases Auxiliares
+    |   ├── windows                         # Ventanas
+    │   │   ├── AddIngredient.py                # Ventana que agrega ingrediente
+    │   │   ├── AddMethod.py                    # Ventana que agrega paso
+    │   │   ├── EditRecipe.py                   # Ventana editar receta
+    │   │   ├── NewRecipe.py                    # Ventana crear receta
+    │   │   ├── ReadRecipe.py                   # Ventana leer receta
+    │   │   └── IBaseWindow.py                  # Base de las ventanas
+    │   └── utils                           # Controlador de la BD
+    │       ├── db_config.py                    # Credenciales 
+    │       ├── db_migrate.py                   # Migracion 
+    │       └── db_utils.py                     # Controlador
     ├── .gitignore                            
     ├── main.py                         # Ventana principal
+    ├── constant.py                     # Enrutador
+    ├── requirements.txt                # Dependencias
     └── README.md
 
 ## 🏁 Instalación/Ejecución <a name = "getting_started"></a>
+
+Crear entorno virtual
+
+```bash
+python -m venv env
+```
+
+Activar entorno
+
+```bash
+source env\Scripts\activate
+```
 
 Clonar el repositorio
 
@@ -106,6 +118,29 @@ Ir al directorio del proyecto
 
 ```bash
 cd recetario_cocina_app
+```
+
+Instalar dependencias
+
+```bash
+pip install -r requirements.txt
+```
+
+Ingresar credenciales de MYSQL
+
+```bash
+# src/utils/db_config.py
+DB_CONFIG = {
+    'host': 'localhost',
+    'user': 'user',
+    'password': 'password',
+    'database': 'recipe_manager'
+}
+```
+
+Migrar la base de datos
+```bash
+python src/utils/db_migrate.py
 ```
 
 Iniciar programa
@@ -142,11 +177,11 @@ python main.py
 - [Python 3.10.0](https://www.python.org) - Lenguaje
 - Librerias usadas:
     - [Tkinter](https://docs.python.org/es/3/library/tkinter.html) - Interface de Python para Tcl/Tk
-    - [csv](https://docs.python.org/3/library/csv.html) - Lectura y Escritura de Archivos CSV
     - [datetime](https://docs.python.org/es/3/library/datetime.html) - Tipos básicos de fecha y hora
     - [os](https://docs.python.org/es/3/library/datetime.html) - Interfaces misceláneas del sistema operativo
     - [random](https://docs.python.org/es/3.10/library/random.html?highlight=random#module-random) - Generar números pseudoaleatorios
     - [PIL](https://github.com/python-pillow/Pillow/) - Python Imaging Library
+    - MySQL
 
 ## ✍️ Autor <a name = "authors"></a>
 - Daniel Tejerina ([@mettralla](https://github.com/mettralla)) - [Linkedin](https://www.linkedin.com/in/daniel-alejandro-tejerina/)

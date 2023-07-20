@@ -1,9 +1,7 @@
 from src.windows.AddIngredient import *
 from src.windows.AddMethod import *
 from src.windows.IBaseWindow import *
-from modules.globalVar import METHOD_LIST, INGREDIENT_LIST, RECIPE_LIST, DESTINATION
-from src.Ingredient import Ingredient
-import csv
+from constant import IMAGES_DIR 
 from tkinter import filedialog as fd
 from tkinter import messagebox as msg
 import itertools
@@ -15,47 +13,41 @@ class EditRecipe(ttk.Frame, IBaseWindow):
         ttk.Frame.__init__(self, parent, padding=(20))
         IBaseWindow.__init__(self, parent, title)
 
+        self.db_utils = DBUtils()
+        self.db_utils.connect()
+
         self.id = recipe_id
-        self.recipe = self.get_recipe()
+        self.recipe = self.db_utils.get_recipe_by_id(recipe_id)
+        self.recipe_original = self.recipe.copy()
+        self.add_flag = False
 
         self.name = tk.StringVar()
         self.preparation_time = tk.StringVar()
         self.cooking_time = tk.StringVar()
         self.tags = tk.StringVar()
         self.favorite = tk.StringVar()
+        
+        # GUARDA LOS IDS DE INGREDIENTES_RECETA
+        self.ingredient_value = None
+        self.ingredients_temp = []
+
+        #RECIBE LOS DATOS DEL TOP LEVEL
+        self.data_ing = None
+        # GUARDA NOMBRE Y MEDIDAS
+        self.tree_ing_data = []
+        
+        # RECIBE LOS DATOS DE TOP LEVEL
+        # IDS
+        self.prep_id = None
+        self.prep_id_list = []
+        # DESCRICIONES
+        self.prep_desc = None
+        self.prep_desc_list = []
 
         parent.rowconfigure(8, weight=1)  # buttons
 
         self.create_ui()
         self.set_variables()
-
-    def get_recipe(self) -> dict:
-        '''Lee el fichero, identifica la receta a traves del id y la convierte en un diccionario lista para ser mostrada'''
-        selected_recipe = {}
-        with open(RECIPE_LIST, "r", newline="\n") as csvfile:
-            reader = csv.reader(csvfile)
-            for recipe in reader:
-                try:
-                    if int(recipe[0]) == self.id:
-                        selected_recipe = {
-                            'id': recipe[0],
-                            'nombre': recipe[1],
-                            'ingredientes': recipe[2],
-                            'cantidades': recipe[3],
-                            'preparacion': recipe[4],
-                            'tiempo de preparacion': recipe[5],
-                            'tiempo de coccion': recipe[6],
-                            'creado': recipe[7],
-                            'imagen': recipe[8],
-                            'etiquetas': recipe[9],
-                            'favorito': recipe[10]
-                            
-                        }
-                    else:
-                        pass
-                except ValueError:
-                    pass
-        return selected_recipe
 
     def create_ui(self) -> None:
         '''Crea la interfaz que usara el usuario para crear la receta'''
@@ -75,127 +67,80 @@ class EditRecipe(ttk.Frame, IBaseWindow):
         self.preparation_time.set(self.recipe['tiempo de preparacion'])
         self.cooking_time.set(self.recipe['tiempo de coccion'])
         self.tags.set(self.recipe['etiquetas'])
-        self.favorite.set(self.recipe['favorito'])
+        self.favorite.set('Si' if self.recipe['favorito'] == 1 else 'No')
 
     def load_ingredients(self) -> None:
         '''Carga los ingredientes de la lista en el Treeview'''
         ingredients = self.recipe['ingredientes'].split(',')
         amounts = self.recipe['cantidades'].split(',')
-        if '' in ingredients:
-            ingredients.remove('')
-            amounts.remove('')
-        for index, _  in enumerate(ingredients, 0):
-            if ingredients != '':
+        for i  in range(len(ingredients)):
+            if len(ingredients) != 0:
                 self.ingredient_list.insert(
-                    '', tk.END, values=[amounts[index], ingredients[index]])
-                index += 1
+                '', tk.END, values=[amounts[i], ingredients[i]])
 
     def new_ingredient(self) -> None:
         '''Abre una ventana para agregar un ingrediente'''
         toplevel = tk.Toplevel(self.parent)
-        AddIngredient(toplevel).grid()
-
-    def add_ingredient_to_dict(self) -> None:
-        '''Agrega la ingrediente al diccionario de la receta que se esta editando'''
-        ing = self.recipe['ingredientes'].split(',')
-        amts = self.recipe['cantidades'].split(',')
-        with open(INGREDIENT_LIST, "r", newline="\n") as csvfile:
-            reader = csv.DictReader(csvfile)
-            for ingredient in reader:
-                new_ingredient = Ingredient(
-                    ingredient['nombre'],
-                    ingredient['cantidad'],
-                    ingredient['medida']
-                )
-        ing.append(new_ingredient.get_name())
-        amts.append(new_ingredient.get_amount())
-        self.recipe['ingredientes'] = self.list_to_str(ing)
-        self.recipe['cantidades'] = self.list_to_str(amts)
+        add_ingredient_window = AddIngredient(toplevel, self).grid()
+        toplevel.wait_window(add_ingredient_window)
+        if self.add_flag:
+            self.recipe['cantidades'] = f"{self.recipe['cantidades']},{self.data_ing[0]}"
+            self.recipe['ingredientes'] = f"{self.recipe['ingredientes']},{self.data_ing[1]}"
+            self.ingredients_temp.append(self.ingredient_value)
+            self.tree_ing_data.append(self.data_ing[1])
+            self.refresh_ingredient_tree()
+            self.add_flag = False
 
     def refresh_ingredient_tree(self) -> None:
         '''Actualiza la lista de ingredientes'''
         try:
-            self.add_ingredient_to_dict()
             self.ingredient_list = self.create_treeview(2, 1, 1, ('Cantidad', 'Ingredientes'))
             self.load_ingredients()
-            self.reset_file(INGREDIENT_LIST, ["nombre", "cantidad", "medida"])
         except UnboundLocalError:
             msg.showerror(message='No realizo ningun cambio', title='Error al actualizar', parent = self.parent)
 
     def delete_ingredient(self) -> None:
         '''Elimina el ultimo ingrediente de la lista de ingredientes'''
         try:
-            if self.recipe['ingredientes'] != '':
-                ingredients = self.recipe['ingredientes'].split(',')
-                amounts = self.recipe['cantidades'].split(',')
-                ingredients.pop(-1)
-                amounts.pop(-1)
-                self.recipe['ingredientes'] = self.list_to_str(ingredients)
-                self.recipe['cantidades'] = self.list_to_str(amounts)
-                self.ingredient_list = self.create_treeview(2, 1, 1, ('Cantidad', 'Ingredientes'))
-                self.load_ingredients()
-            else:
-                raise IndexError
+            if self.ingredients_temp != []:
+                self.db_utils.delete_ingredient_to_recipe(self.ingredients_temp.pop())
+                self.tree_ing_data.pop()
+            ingredients = self.recipe['ingredientes'].split(',')[:-1]
+            amounts = self.recipe['cantidades'].split(',')[:-1]
+            self.recipe['ingredientes'] = ','.join(ingredients)
+            self.recipe['cantidades'] = ','.join(amounts)
+            self.refresh_ingredient_tree()
         except IndexError:
             msg.showerror(message='No hay ningun ingrediente en la lista',
-                          title='Eliminar ingrediente', parent=self.parent)
+                          title='Eliminar ingrediente',
+                          parent = self.parent)
 
-    def reset_file(self, route: str, fieldlist: list[str]) -> None:
-        '''Elimina los items de las lista temporales dejando solo los encabezados.
-            params:
-                (str) route: la ruta del csv a resetear
-                (list) fieldlist: los encabezados del fichero
-        '''
-        with open(route, "w", newline="\n") as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=fieldlist)
-            writer.writeheader()
-
-    def list_to_str(self, f_list:list) -> str:
-        '''Transforma la lista de ingredientes en string y la devuelve'''
-        if f_list:
-            str_list = ''
-            for item in f_list:
-                str_list = str_list + item + ','
-            string_list = str_list[:-1]
-            if string_list[0] == ',':
-                string_list = str_list[1:]
-                return string_list
-            else:
-                return string_list
-        else: 
-            return ''
+# PREP METHOD ----------------------------------------------
 
     def load_prep_methods(self) -> None:
         '''Carga los ingredientes de la lista en el Treeview'''
         prep_methods = self.recipe['preparacion'].split(',')
-        id = 1
-        for prep_method in prep_methods:
-            if prep_method != '':
-                self.method_list.insert(
-                        '', tk.END, values=[id, prep_method])
-                id += 1
+        for i, prep_method in enumerate(prep_methods, start=1):
+            if len(prep_method) != 0:
+                self.method_list.insert('', tk.END, values=[i, prep_method])
 
     def new_method(self) -> None:
         '''Abre una ventana para agregar paso de preparacion'''
         toplevel = tk.Toplevel(self.parent)
-        AddMethod(toplevel).grid()
-
-    def add_method_to_dict(self) -> None:
-        '''Agrega la ingrediente al diccionario de la receta que se esta editando'''
-        prep = self.recipe['preparacion'].split(',')
-        with open(METHOD_LIST, "r", newline="\n") as csvfile:
-            reader = csv.DictReader(csvfile)
-            for prep_method in reader:
-                prep.append(prep_method['paso'])
-        self.recipe['preparacion'] = self.list_to_str(prep)
+        add_prep_method_window = AddMethod(toplevel, self).grid()
+        toplevel.wait_window(add_prep_method_window)
+        if self.add_flag:
+            self.recipe['preparacion'] = f"{self.recipe['preparacion']},{self.prep_desc}"
+            self.prep_id_list.append(self.prep_id)
+            self.prep_desc_list.append(self.prep_desc)
+            self.refresh_method_tree()
+            self.add_flag = False
 
     def refresh_method_tree(self) -> None:
         '''Actualiza la lista de preparacion'''
         try:
-            self.add_method_to_dict()
             self.method_list = self.create_treeview(4, 1, 0, ('Id', 'Pasos'))
             self.load_prep_methods()
-            self.reset_file(METHOD_LIST, ["id", "paso"])
         except UnboundLocalError:
             msg.showerror(message='No realizo ningun cambio',
                           title='Error al actualizar', parent=self.parent)
@@ -203,14 +148,12 @@ class EditRecipe(ttk.Frame, IBaseWindow):
     def delete_method(self) -> None:
         '''Elimina el ultimo elemento de la lista de preparacion'''
         try:
-            if self.recipe['preparacion'] != '':
-                prep = self.recipe['preparacion'].split(',')
-                prep.pop(-1)
-                self.recipe['preparacion'] = self.list_to_str(prep)
-                self.method_list = self.create_treeview(4, 1, 0, ('Id', 'Pasos'))
-                self.load_prep_methods()
-            else:
-                raise IndexError
+            if self.prep_id_list != []:
+                self.db_utils.delete_prep_method(self.prep_id_list.pop())
+                self.prep_desc_list.pop()
+            prep = self.recipe['preparacion'].split(',')[:-1]
+            self.recipe['preparacion'] = ','.join(prep)
+            self.refresh_method_tree()
         except IndexError:
             msg.showerror(message='No hay ningun paso en la lista',
                           title='Eliminar ingrediente', parent=self.parent)
@@ -223,7 +166,7 @@ class EditRecipe(ttk.Frame, IBaseWindow):
             )
         )
         if self.image != None:
-            shutil.copy(self.image, DESTINATION)
+            shutil.copy(self.image, IMAGES_DIR)
             img_name = self.image.split('/')[-1]
             self.recipe['imagen'] = "images\\" + img_name  # CORREGIR FORMATO
             msg.showinfo(
@@ -240,75 +183,31 @@ class EditRecipe(ttk.Frame, IBaseWindow):
 
     def delete_image(self) -> None:
         '''Elimina la receta si la encuentra'''
-        if self.recipe['imagen'] == 'None':
+        if self.recipe['imagen'] == None:
             msg.showinfo(title='Borrar imagen', message='Esta receta no tiene imagen', parent=self.parent)
         else:
             os.remove(self.recipe['imagen'])
-            self.recipe['imagen'] = 'None'
+            self.recipe['imagen'] = None
             msg.showinfo(title='Borrar imagen', message='Imagen borrada', parent = self.parent)
 
     def save(self) -> None:
         '''Toma los datos ingresados en la ventana y los almacena en csv_files'''
-        recipes = []
-        with open(RECIPE_LIST, "r", newline="\n") as csvfile:
-            reader = csv.reader(csvfile)
-            for recipe in reader:
-                try:
-                    if int(recipe[0]) != self.id:
-                        selected_recipe = {
-                            'id': recipe[0],
-                            'nombre': recipe[1],
-                            'ingredientes': recipe[2],
-                            'cantidades': recipe[3],
-                            'preparacion': recipe[4],
-                            'tiempo de preparacion': recipe[5],
-                            'tiempo de coccion': recipe[6],
-                            'creado': recipe[7],
-                            'imagen': recipe[8],
-                            'etiquetas': recipe[9],
-                            'favorito': recipe[10]
-                        }
-                        recipes.append(selected_recipe)
-                    elif int(recipe[0]) == self.id:
-                        edited_recipe = {
-                            'id': self.id,
-                            'nombre': self.name.get(),
-                            'ingredientes': self.recipe['ingredientes'],
-                            'cantidades': self.recipe['cantidades'],
-                            'preparacion': self.recipe['preparacion'],
-                            'tiempo de preparacion': self.preparation_time.get(),
-                            'tiempo de coccion': self.cooking_time.get(),
-                            'creado': self.recipe['creado'],
-                            'imagen': self.recipe['imagen'],
-                            'etiquetas': self.tags.get(),
-                            'favorito': self.favorite.get()
-                            
-                        }
-                        recipes.append(edited_recipe)
-                    else:
-                        pass
-                except ValueError:
-                    pass
-        
-        fields = ['id', 'nombre', 'ingredientes', 'cantidades', 'preparacion',
-                  'tiempo de preparacion', 'tiempo de coccion', 'creado', 'imagen', 'etiquetas', 'favorito']
-        with open(RECIPE_LIST, 'w', newline='\n') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=fields)
-            writer.writeheader()
-            for recipe in recipes:
-                writer.writerow(
-                    {
-                        'id': recipe['id'],
-                        'nombre': recipe['nombre'],
-                        'ingredientes': recipe['ingredientes'],
-                        'cantidades': recipe['cantidades'],
-                        'preparacion': recipe['preparacion'],
-                        'tiempo de preparacion': recipe['tiempo de preparacion'],
-                        'tiempo de coccion': recipe['tiempo de coccion'],
-                        'creado': recipe['creado'],
-                        'imagen': recipe['imagen'],
-                        'etiquetas': recipe['etiquetas'],
-                        'favorito': recipe['favorito']
-                    }
-                )
+        updated_values = {
+            'id': self.id,
+            'nombre': self.name.get(),
+            'tiempo de preparacion': self.preparation_time.get(),
+            'tiempo de coccion': self.cooking_time.get(),
+            'imagen': self.recipe['imagen'],
+            'favorito': 1 if self.favorite.get() == 'Si' else 0
+        }
+        self.db_utils.update_recipe(updated_values)
+        edited_recipe = {
+            'ingredientes': self.recipe['ingredientes'],
+            'cantidades': self.recipe['cantidades'],
+            'preparacion': self.recipe['preparacion'],
+            'etiquetas': self.tags.get(),
+            'ingredients_id': self.ingredients_temp,
+            'methods_id': self.prep_id_list
+        }
+        self.db_utils.check_and_update(edited_recipe, self.recipe_original)
         self.parent.destroy()

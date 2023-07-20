@@ -40,3 +40,6 @@ dmypy.json
 #others
 examples/
 test/
+
+#credentials
+src/utils/db_config.py

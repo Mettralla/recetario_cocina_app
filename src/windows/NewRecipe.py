@@ -1,11 +1,10 @@
 from src.windows.AddIngredient import *
 from src.windows.AddMethod import *
-from modules.globalVar import METHOD_LIST, INGREDIENT_LIST, RECIPE_LIST
+from constant import IMAGES_DIR 
 from src.windows.IBaseWindow import *
-from src.Ingredient import Ingredient
-from src.Recipe import Recipe
 from tkinter import filedialog as fd
 from tkinter import messagebox as msg
+import shutil
 
 class NewRecipe(ttk.Frame, IBaseWindow):
     def __init__(self, parent, title: str) -> None:
@@ -18,6 +17,25 @@ class NewRecipe(ttk.Frame, IBaseWindow):
         self.tags = tk.StringVar()
         self.favorite = tk.StringVar()
         self.image = None
+
+        # GUARDA LOS IDS DE INGREDIENTES_RECETA
+        self.ingredient_value = None
+        self.ingredients_temp = []
+        
+        self.add_flag = False
+
+        #RECIBE LOS DATOS DEL TOP LEVEL
+        self.data_ing = None
+        # GUARDA NOMBRE Y MEDIDAS
+        self.tree_ing_data = []
+        
+        # RECIBE LOS DATOS DE TOP LEVEL
+        # IDS
+        self.prep_id = None
+        self.prep_id_list = []
+        # DESCRICIONES
+        self.prep_desc = None
+        self.prep_desc_list = []
 
         # AGREGAR LOS BOTONES
         parent.rowconfigure(8, weight=1)  # buttons
@@ -34,108 +52,75 @@ class NewRecipe(ttk.Frame, IBaseWindow):
 
         self.base_ui_config('Crear')
 
+# INGREDIENTS ----------------------------------------
+
     def load_ingredients(self) -> None:
         '''Lee el los ingredientes de la lista de ingredientes y los muestra'''
-        with open(INGREDIENT_LIST, newline="\n") as csvfile:
-            reader = csv.DictReader(csvfile)
-            for ingredient in reader:
-                data = [ingredient["cantidad"] + ' ' +
-                        ingredient["medida"], ingredient["nombre"]]
-                self.ingredient_list.insert('', tk.END, values=data)
+        for ingredient in self.tree_ing_data:
+            data = [ingredient[0], ingredient[1]]
+            self.ingredient_list.insert('', tk.END, values=data)
 
     def new_ingredient(self) -> None: 
         '''Abre una ventana para agregar un ingrediente'''
         toplevel = tk.Toplevel(self.parent)
-        AddIngredient(toplevel).grid()
+        add_ingredient_window = AddIngredient(toplevel, self).grid()
+        toplevel.wait_window(add_ingredient_window)
+        if self.add_flag:
+            self.ingredients_temp.append(self.ingredient_value)
+            self.tree_ing_data.append(self.data_ing)
+            self.refresh_ingredient_tree()
+            self.add_flag = False
 
     def refresh_ingredient_tree(self) -> None:
         '''Actualiza la lista de ingredientes'''
         self.ingredient_list = self.create_treeview(2, 1, 1, ('Cantidad', 'Ingredientes'))
         self.load_ingredients()
 
+    def delete_ingredient(self) -> None:
+        '''Borra el ultimo ingrediente de la lista'''
+        try:
+            self.db_utils.delete_ingredient_to_recipe(self.ingredients_temp.pop())
+            self.tree_ing_data.pop()
+            self.refresh_ingredient_tree()
+        except IndexError:
+            msg.showerror(message='No hay ningun ingrediente en la lista',
+                          title='Eliminar ingrediente',
+                          parent = self.parent)
+
+# PREP METHODS ----------------------------------------
+
     def load_prep_methods(self) -> None:
         '''Lee los pasos de preparacion de la lista de pasos y los muestra'''
-        with open(METHOD_LIST, newline="\n") as csvfile:
-            reader = csv.DictReader(csvfile)
-            for method in reader:
-                data = [method["id"], method["paso"]]
-                self.method_list.insert('', tk.END, values=data)
+        for order, detail in enumerate(self.prep_desc_list, start=1):
+            data = [order, detail]
+            self.method_list.insert('', tk.END, values=data)
 
     def new_method(self) -> None:
         '''Crea una ventana para agregar un paso a la lista de preparacion'''
         toplevel = tk.Toplevel(self.parent)
-        AddMethod(toplevel).grid()
+        add_prep_method_window = AddMethod(toplevel, self).grid()
+        toplevel.wait_window(add_prep_method_window)
+        if self.add_flag:
+            self.prep_id_list.append(self.prep_id)
+            self.prep_desc_list.append(self.prep_desc)
+            self.refresh_method_tree()
+            self.add_flag = False
 
     def refresh_method_tree(self) -> None:
         '''Actualiza la lista de pasos de preparacion'''
         self.method_list = self.create_treeview(4, 1, 0, ('Id', 'Pasos'))
         self.load_prep_methods()
 
-    def get_last_recipe_id(self) -> int:
-        '''Obtiene el id del ultimo item de la lista de recetas y lo regresa, si no existe devuelve 0'''
-        with open(RECIPE_LIST, newline="\n") as csvfile:
-            last_id = 0
-            reader = csv.DictReader(csvfile)
-            for recipe in reader:
-                if recipe['id'] != 'id' or recipe['id'] != '\n':
-                    id = int(recipe['id'])
-                    last_id = id
-                else:
-                    pass
-            if last_id != 0:
-                return last_id
-            else:
-                return 0
+    def delete_method(self) -> None:
+        '''Borra el ultimo paso de preparacion de la lista'''
+        try:
+            self.db_utils.delete_prep_method(self.prep_id_list.pop())
+            self.prep_desc_list.pop()
+            self.refresh_method_tree()
+        except IndexError:
+            msg.showerror(message='No hay ningun paso en la lista', title='Eliminar paso de preparacion', parent = self.parent)
 
-    def get_recipe_ingredients(self) -> list[Ingredient]:
-        '''Lee el fichero de ingredientes y los convierte en objetos Ingredientes. Devuelve una lista de objetos.'''
-        f_ingredients = []
-        with open(INGREDIENT_LIST, newline="\n") as csvfile:
-            reader = csv.DictReader(csvfile)
-            for ingredient in reader:
-                new_ingredient = Ingredient(
-                    ingredient['nombre'], 
-                    ingredient['cantidad'], 
-                    ingredient['medida']
-                )
-                f_ingredients.append(new_ingredient)
-        self.reset_file(INGREDIENT_LIST, ["nombre", "cantidad", "medida"])
-        return f_ingredients
-
-    def get_recipe_methods(self) -> list:
-        '''Lee la lista de pasos de preparacion y lo formatea para agregar a la receta'''
-        f_methods = []
-        with open(METHOD_LIST, newline="\n") as csvfile:
-            reader = csv.DictReader(csvfile)
-            for prep_method in reader:
-                f_methods.append(prep_method['paso'])
-        self.reset_file(METHOD_LIST, ["id", "paso"])
-        return f_methods
-
-    def get_recipe(self) -> dict[str]:
-        '''Toma los valores ingresados y los convierte en un objeto Receta, regresa los datos formateados en un diccionario de strings'''
-        new_recipe = Recipe(
-            id = self.get_last_recipe_id() + 1,
-            name = self.name.get(), 
-            ingredients = self.get_recipe_ingredients(),
-            preparation = self.get_recipe_methods(),
-            preparation_time = self.preparation_time.get(),
-            cooking_time = self.cooking_time.get(),
-            image = self.image,
-            tags = self.tags.get(),
-            favorite= self.favorite.get()
-        )
-        return new_recipe.format_values()
-
-    def reset_file(self, route: str, fieldlist: list[str]) -> None:
-        '''Elimina los items de las lista temporales dejando solo los encabezados.
-            params:
-                (str) route: la ruta del csv a resetear
-                (list) fieldlist: los encabezados del fichero
-        '''
-        with open(route, "w", newline="\n") as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=fieldlist)
-            writer.writeheader()
+# ??? ----------------------------------------
 
     def add_image(self) -> None:
         '''Guarda la direccion de la imagen a guardar'''
@@ -157,84 +142,64 @@ class NewRecipe(ttk.Frame, IBaseWindow):
                 parent=self.parent 
         )
 
-    def delete_method(self) -> None:
-        '''Borra el ultimo paso de preparacion de la lista'''
+    def get_source(self, image: str) -> str:
+        '''Copia la imagen a la carpeta de imagenes y devuelve el ruta'''
         try:
-            method_list = []
-            fields = ["id", "paso"]
-            with open(METHOD_LIST,  "r", newline="\n") as csvfile:
-                reader = csv.reader(csvfile)
-                for prep_method in reader:
-                    if prep_method[0] == "id":
-                        pass
-                    else:
-                        method_list.append(prep_method)
-            method_list.pop()
-            with open(METHOD_LIST, "w", newline="\n") as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=fields)
-                writer.writeheader()
-                for prep_method in method_list:
-                    writer.writerow(
-                        {
-                            'id': prep_method[0],
-                            'paso': prep_method[1]
-                        }
-                    )
-            self.refresh_method_tree()
-        except IndexError:
-            msg.showerror(message='No hay ningun paso en la lista', title='Eliminar paso de preparacion', parent = self.parent)
+            if image != None:
+                shutil.copy(image, IMAGES_DIR)
+                img_name = image.split('/')[-1]
+                return "images\\" + img_name  # CORREGIR FORMATO
+            else:
+                return None
+        except:
+            msg.showerror(
+                message='Un error sucedio durante la creacion de la imagen', title='Agregar Imagen')
 
-    def delete_ingredient(self) -> None:
-        '''Borra el ultimo ingrediente de la lista'''
-        try:
-            ingredient_list = []
-            fields = ["nombre", "cantidad", "medida"]
-            with open(INGREDIENT_LIST,  "r", newline="\n") as csvfile:
-                reader = csv.reader(csvfile)
-                for ingredient in reader:
-                    if ingredient[0] == "nombre":
-                        pass
-                    else:
-                        ingredient_list.append(ingredient)
-            ingredient_list.pop()
-            with open(INGREDIENT_LIST, "w", newline="\n") as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=fields)
-                writer.writeheader()
-                for ingredient in ingredient_list:
-                    writer.writerow(
-                        {
-                            'nombre': ingredient[0],
-                            'cantidad': ingredient[1],
-                            'medida': ingredient[2]
-                        }
-                    )
-            self.refresh_ingredient_tree()
-        except IndexError:
-            msg.showerror(message='No hay ningun ingrediente en la lista',
-                          title='Eliminar ingrediente',
-                          parent = self.parent)
+    def get_fav(self, favorite):
+        return 1 if favorite == 'Si' else 0
+
+    def get_tag_list(self, tags):
+        tag_list = tags.replace(' ', '').split(',')
+        return tag_list
+
+    def get_tags_id(self, tags: str) -> list[int]:
+        tag_list = self.get_tag_list(tags)
+        tag_id_list = []
+        for tag in tag_list:
+            tag_id = self.db_utils.create_tag(tag)
+            tag_id_list.append(tag_id)
+        return tag_id_list
+
+    def recipe_tags(self, tag_list, recipe_id):
+        for tag in tag_list:
+            self.db_utils.create_tag_recipe(tag, recipe_id)
+
+    def recipe_ingredients(self, ingredients_ids, recipe_id):
+        for id in ingredients_ids:
+            self.db_utils.add_recipe_id_to_ingredients(id, recipe_id)
+
+    def recipe_prep_methods(self, prep_method_ids, recipe_id):
+        for order, method_id in enumerate(prep_method_ids, start=1):
+            self.db_utils.add_prep_method_to_recipe(method_id, order, recipe_id)
 
     def save(self) -> None:
         '''Toma los datos ingresados en la ventana y los almacena en csv_files'''
-        new_recipe = self.get_recipe()
-        fields = ['id', 'nombre', 'ingredientes', 'cantidades', 'preparacion', 'tiempo de preparacion', 'tiempo de coccion', 'creado', 'imagen', 'etiquetas', 'favorito']
-        with open(RECIPE_LIST, 'a') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=fields)
-            writer.writerow(
-                {
-                    'id': new_recipe['id'],
-                    'nombre': new_recipe['nombre'],
-                    'ingredientes': new_recipe['ingredientes'],
-                    'cantidades': new_recipe['cantidades'],
-                    'preparacion': new_recipe['preparacion'],
-                    'tiempo de preparacion': new_recipe['tiempo de preparacion'],
-                    'tiempo de coccion': new_recipe['tiempo de coccion'],
-                    'creado': new_recipe['creado'],
-                    'imagen': new_recipe['imagen'],
-                    'etiquetas': new_recipe['etiquetas'],
-                    'favorito': new_recipe['favorito']
-                }
-            )
+        new_recipe = {
+            'name': self.name.get(),
+            'prep_time': self.preparation_time.get(),
+            'cook_time': self.cooking_time.get(),
+            'image': self.get_source(self.image),
+            'favorite': self.get_fav(self.favorite.get()),
+        }
+        recipe_id = self.db_utils.create_recipe(new_recipe)
+        tag_ids = self.get_tags_id(self.tags.get())
+        self.recipe_tags(tag_ids, recipe_id)
+        self.recipe_ingredients(self.ingredients_temp, recipe_id)
+        self.recipe_prep_methods(self.prep_id_list, recipe_id)
+
         self.parent.destroy()
         msg.showinfo(message='Receta creada, actualice la lista',
-                      title='Receta agregada')
+        title='Receta agregada')
+
+    def __del__(self):
+        self.db_utils.disconnect()

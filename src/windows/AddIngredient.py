@@ -1,13 +1,16 @@
 import tkinter as tk
 from tkinter import ttk
-import csv
-from modules.globalVar import INGREDIENT_LIST
+from src.utils.db_utils import DBUtils
 
 class AddIngredient(ttk.Frame):
     '''Clase que representa la ventana de agregar ingrediente individual'''
-    def __init__(self, parent) -> None:
+    def __init__(self, parent, recipe_instance) -> None:
         super().__init__(parent, padding=(20))
         self.parent = parent
+        self.recipe_instance = recipe_instance
+
+        self.db_utils = DBUtils()
+        self.db_utils.connect()
 
         parent.title('Ingredientes')
         parent.geometry('250x140')
@@ -25,7 +28,6 @@ class AddIngredient(ttk.Frame):
                         'cucharadas', 'cucharaditas', 'unidades', 'taza', 'mililitros', 'litros', 'a gusto']
 
         # GRID
-
         # COLUMNS
         parent.columnconfigure(0, weight=1)
         parent.columnconfigure(1, weight=1)
@@ -61,16 +63,20 @@ class AddIngredient(ttk.Frame):
             row=3, column=2, padx=5, columnspan=2, sticky=tk.EW)
 
     def add_ingredient(self):
-        '''Toma los datos ingresados en la ventana y los almacena en csv_files'''
-        new_ingredient = {"nombre": self.ingrediente.get(
-        ), "cantidad": self.cantidad.get(), "medida": self.medida.get()}
-        campos = ["nombre", "cantidad", "medida"]
-        with open(INGREDIENT_LIST, 'a') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=campos)
-            writer.writerow(
-                {
-                    "nombre": new_ingredient['nombre'], "cantidad": new_ingredient['cantidad'], "medida": new_ingredient['medida']
-                }
-            )
-        
+        new_ingredient = {
+            "nombre": self.ingrediente.get(),
+            "cantidad": self.cantidad.get(),
+            "medida": self.medida.get()
+        }
+        new_ingredient_id = self.db_utils.create_ingredient(new_ingredient['nombre'])
+        ingredient_value = self.db_utils.add_ingredient_to_recipe(new_ingredient_id, new_ingredient['cantidad'], new_ingredient['medida'])
+        self.close_window(ingredient_value, new_ingredient)
+
+    def close_window(self, ingredient_value, new_ingredient):
+        self.recipe_instance.ingredient_value = ingredient_value
+        self.recipe_instance.data_ing = (str(new_ingredient['cantidad']) + ' ' + new_ingredient['medida'], new_ingredient['nombre'])
+        self.recipe_instance.add_flag = True
         self.parent.destroy()
+
+    def __del__(self):
+        self.db_utils.disconnect()

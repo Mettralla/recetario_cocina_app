@@ -43,6 +43,3 @@ DB_CONFIG_FILE = os.path.join(UTILS_DIR, 'db_config.py')
 
 # Archivo con utilidades para interactuar con la base de datos
 DB_UTILS_FILE = os.path.join(UTILS_DIR, 'db_utils.py')
-
-# Archivo principal de la aplicación
-# MAIN_FILE = os.path.join(BASE_DIR, 'main.py')

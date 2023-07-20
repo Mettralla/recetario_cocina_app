@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from src.utils.db_utils import DBUtils
 import tkinter as tk
 from tkinter import ttk
 
@@ -10,6 +11,9 @@ class IBaseWindow(ABC):
         self.parent.geometry('600x720')
         self.parent.config(bg='#d9d9d9')
         self.parent.resizable(0, 0)
+        
+        self.db_utils = DBUtils()
+        self.db_utils.connect()
         
         # COLUMNS
         for i in range(7):
@@ -86,8 +90,3 @@ class IBaseWindow(ABC):
             tree.heading('Pasos', text='Pasos')
 
         return tree
-
-#INGREDIENTES
-# self.create_treeview(2, 1, 1, ('Cantidad', 'Ingredientes'))
-#PASOS
-# self.create_treeview(4, 1, 0, ('Id', 'Pasos'))

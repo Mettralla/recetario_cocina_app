@@ -1,7 +1,5 @@
 import tkinter as tk
 from tkinter import ttk
-import csv
-from modules.globalVar import RECIPE_LIST
 from src.windows.IBaseWindow import *
 from PIL import ImageTk, Image
 
@@ -10,8 +8,11 @@ class ReadRecipe(ttk.Frame, IBaseWindow):
         ttk.Frame.__init__(self, parent, padding=(20))
         IBaseWindow.__init__(self, parent, title)
 
+        self.db_utils = DBUtils()
+        self.db_utils.connect()
+
         self.id = recipe_id
-        self.recipe = self.get_recipe()
+        self.recipe = self.db_utils.get_recipe_by_id(recipe_id)
         self.star = ImageTk.PhotoImage(
             Image.open('images\star.png').resize((30, 30)))
         self.empty_star = ImageTk.PhotoImage(
@@ -19,38 +20,10 @@ class ReadRecipe(ttk.Frame, IBaseWindow):
 
         self.create_ui()
 
-
-    def get_recipe(self) -> dict:
-        '''Lee el fichero, identifica la receta a traves del id y la convierte en un diccionario lista para ser mostrada'''
-        selected_recipe = {}
-        with open(RECIPE_LIST, "r", newline="\n") as csvfile:
-            reader = csv.reader(csvfile)
-            for recipe in reader:
-                try:
-                    if int(recipe[0]) == self.id:
-                        selected_recipe = {
-                            'id': recipe[0],
-                            'nombre': recipe[1],
-                            'ingredientes': recipe[2],
-                            'cantidades': recipe[3],
-                            'preparacion': recipe[4],
-                            'tiempo de preparacion': recipe[5],
-                            'tiempo de coccion': recipe[6],
-                            'creado': recipe[7],
-                            'imagen': recipe[8],
-                            'etiquetas': recipe[9],
-                            'favorito': recipe[10]
-                        }
-                    else: 
-                        pass
-                except ValueError:
-                        pass
-        return selected_recipe
-
     def create_ui(self) -> None:
         '''Muestra la receta'''
         # TITULO
-        if self.recipe['favorito'] == 'Si':
+        if self.recipe['favorito'] == 1:
             ttk.Label(self.parent, text=self.recipe['nombre'], font=(
                 'Arial', 25), image=self.star, compound=tk.LEFT, justify=tk.LEFT).grid(row=0, column=1)
         else: 
@@ -58,7 +31,7 @@ class ReadRecipe(ttk.Frame, IBaseWindow):
                 'Arial', 25), image=self.empty_star, compound=tk.LEFT, justify=tk.LEFT).grid(row=0, column=1)
         
         # IMAGEN
-        if self.recipe['imagen'] != 'None':
+        if self.recipe['imagen'] != None:
             self.img = ImageTk.PhotoImage(
                 Image.open(self.recipe['imagen']).resize((100, 100)))
             ttk.Label(self.parent, image=self.img).grid(
@@ -108,3 +81,6 @@ class ReadRecipe(ttk.Frame, IBaseWindow):
             self.method_list.insert(
                 '', tk.END, values=[index, prep_value]
             )
+
+    def __del__(self):
+        self.db_utils.disconnect()
