@@ -4,6 +4,28 @@ from src.windows.IBaseWindow import *
 from PIL import ImageTk, Image
 
 class ReadRecipe(ttk.Frame, IBaseWindow):
+    """Class representing the window to read a recipe.
+
+    This class displays the details of a specific recipe on the window. It inherits from `ttk.Frame` and `IBaseWindow`,
+    providing common configurations for the window.
+
+    Parameters
+    ----------
+        parent (tk.Tk or tk.Toplevel): The parent window to which this window is associated.
+        title (str): The title of the window.
+        recipe_id (str): The ID of the recipe to be displayed.
+
+    Attributes
+    ----------
+        db_utils (DBUtils): An instance of the DBUtils class for database-related operations.
+        id (str): The ID of the recipe being displayed.
+        recipe (dict): A dictionary containing the details of the recipe fetched from the database.
+        star (ImageTk.PhotoImage): An ImageTk.PhotoImage object representing a filled star icon.
+        empty_star (ImageTk.PhotoImage): An ImageTk.PhotoImage object representing an empty star icon.
+        img (ImageTk.PhotoImage): An ImageTk.PhotoImage object representing the recipe's image.
+        ingredient_list (ttk.Treeview): A Treeview widget to display the list of ingredients for the recipe.
+        method_list (ttk.Treeview): A Treeview widget to display the list of preparation steps for the recipe.
+    """
     def __init__(self, parent, title: str, recipe_id: str) -> None:
         ttk.Frame.__init__(self, parent, padding=(20))
         IBaseWindow.__init__(self, parent, title)
@@ -21,7 +43,11 @@ class ReadRecipe(ttk.Frame, IBaseWindow):
         self.create_ui()
 
     def create_ui(self) -> None:
-        '''Muestra la receta'''
+        """Create the user interface for displaying the recipe details.
+
+        This method creates and arranges the widgets to display the recipe details, including the recipe name, image,
+        ingredient list, preparation steps, preparation and cooking times, tags, and a "Close" button.
+        """
         # TITULO
         if self.recipe['favorito'] == 1:
             ttk.Label(self.parent, text=self.recipe['nombre'], font=(
@@ -65,7 +91,11 @@ class ReadRecipe(ttk.Frame, IBaseWindow):
             row=7, column=1, columnspan=5, sticky=tk.NSEW, padx=5, pady=5)
 
     def load_ingredients(self) -> None:
-        '''Carga los ingredientes de la lista en el Treeview'''
+        """Load the ingredients of the recipe into the ingredient_list Treeview.
+
+        This method extracts the ingredients and their corresponding quantities from the recipe dictionary and inserts
+        them into the ingredient_list Treeview for display.
+        """
         ingredients = self.recipe['ingredientes'].split(',')
         amounts = self.recipe['cantidades'].split(',')
         for i in range(len(ingredients)):
@@ -73,7 +103,11 @@ class ReadRecipe(ttk.Frame, IBaseWindow):
                 '', tk.END, values=[amounts[i], ingredients[i]])
 
     def load_method_list(self) -> None:
-        '''Carga los pasos de preparacion en la lista'''
+        """Load the preparation steps of the recipe into the method_list Treeview.
+
+        This method extracts the preparation steps from the recipe dictionary and inserts them into the method_list
+        Treeview for display.
+        """
         prep_methods = self.recipe['preparacion'].split(',')
         # print(prep_methods)
         for index, prep_method in enumerate(prep_methods, 1):
@@ -83,4 +117,9 @@ class ReadRecipe(ttk.Frame, IBaseWindow):
             )
 
     def __del__(self):
+        """Destructor method to disconnect from the database.
+
+        This method is automatically called when the instance of the class is deleted. It disconnects from the database
+        to release the resources.
+        """
         self.db_utils.disconnect()
