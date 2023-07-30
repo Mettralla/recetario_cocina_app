@@ -50,11 +50,11 @@ class ReadRecipe(ttk.Frame, IBaseWindow):
         self.load_method_list()
         
         # TIEMPO DE PREPARACION
-        ttk.Label(self.parent, text=f"Tiempo de Preparacion: {self.recipe['tiempo de preparacion']}", padding=3).grid(
+        ttk.Label(self.parent, text=f"Tiempo de Preparacion: {self.recipe['tiempo de preparacion']} min", padding=3).grid(
             row=5, column=1, columnspan=3, sticky=tk.EW)
         
         # TIEMPO DE COCCION
-        ttk.Label(self.parent, text=f"Tiempo de Cocción: {self.recipe['tiempo de coccion']}", padding=3).grid(
+        ttk.Label(self.parent, text=f"Tiempo de Cocción: {self.recipe['tiempo de coccion']} min", padding=3).grid(
             row=5, column=3, columnspan=3, sticky=tk.EW)
         
         ttk.Label(self.parent, text=f"Etiquetas: {self.recipe['etiquetas']}", padding=3).grid(

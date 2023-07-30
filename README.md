@@ -6,9 +6,9 @@
 ---
 
 <p align="center"> Resolucion del Proyecto Integrador Final de la Catedra Programación 1 de la Carrera de Desarrollo de Software de la Universidad Provincial de Administración, Tecnologia y Oficios (UPATECO). Consiste en una aplicacion de escritorio donde puede almacenarse recetas de cocina. 
+En un principio se administraba a traves de CSV pero se migro a una base de datos MYSQL durante el cursado de Programacion 2. 
+<br> 
 
-En un principio se administraba a traves de CSV pero se migro a una base de datos MYSQL durante. 
-    <br> 
 </p>
 
 ---
@@ -181,10 +181,6 @@ python main.py
 - [Python 3.10.0](https://www.python.org) - Lenguaje
 - Librerias usadas:
     - [Tkinter](https://docs.python.org/es/3/library/tkinter.html) - Interface de Python para Tcl/Tk
-    - [datetime](https://docs.python.org/es/3/library/datetime.html) - Tipos básicos de fecha y hora
-    - [os](https://docs.python.org/es/3/library/datetime.html) - Interfaces misceláneas del sistema operativo
-    - [random](https://docs.python.org/es/3.10/library/random.html?highlight=random#module-random) - Generar números pseudoaleatorios
-    - [PIL](https://github.com/python-pillow/Pillow/) - Python Imaging Library
     - MySQL
 
 ## ✍️ Autor <a name = "authors"></a>

@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from src.utils.db_utils import DBUtils
+from tkinter import messagebox as msg
 
 class AddMethod(ttk.Frame):
     '''Clase que representa a la ventana de agregar nuevo paso de preparacion'''
@@ -50,10 +51,13 @@ class AddMethod(ttk.Frame):
             row=2, column=2, padx=5, sticky=tk.EW)
     
     def add_method(self) -> None:
-        '''Toma los datos ingresados en la ventana y los almacena en csv_files'''
-        new_cooking_method = self.cooking_method.get()
-        new_prep_method_id = self.db_utils.create_prep_method(new_cooking_method)
-        self.close_window(new_cooking_method, new_prep_method_id)
+        '''Toma los datos ingresados en la ventana y los almacena en la base de datos'''
+        try:
+            new_cooking_method = self.cooking_method.get()
+            new_prep_method_id = self.db_utils.create_prep_method(new_cooking_method)
+            self.close_window(new_cooking_method, new_prep_method_id)
+        except Exception as e:
+            msg.showerror(message=f'Error: {e}', title='Nuevo Paso', parent = self.parent)
 
     def close_window(self, new_prep_method, prep_method_id):
         self.recipe_instance.prep_id = prep_method_id

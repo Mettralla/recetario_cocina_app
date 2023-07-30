@@ -14,9 +14,7 @@ recipes = """CREATE table IF NOT EXISTS recetas(
                     tiempo_coccion INT NOT NULL,
                     creado_el TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
                     imagen VARCHAR(75) DEFAULT NULL,
-                    favorito BOOLEAN,
-                    receta_del_dia BOOLEAN DEFAULT 0,
-                    fecha_asignacion DATE DEFAULT NULL)"""
+                    favorito BOOLEAN)"""
 
 ingredients = """CREATE table IF NOT EXISTS ingredientes (
                         id_ingrediente INT NOT NULL AUTO_INCREMENT UNIQUE PRIMARY KEY,

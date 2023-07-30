@@ -55,11 +55,11 @@ class IBaseWindow(ABC):
         self.load_prep_methods()
 
         # TIEMPO DE PREPARACION
-        ttk.Label(self.parent, text="Tiempo de Preparacion:", padding=3).grid(row=5, column=1, sticky=tk.EW)
+        ttk.Label(self.parent, text="Tiempo Preparacion (min):", padding=3).grid(row=5, column=1, sticky=tk.EW)
         ttk.Entry(self.parent, textvariable=self.preparation_time, justify= tk.RIGHT).grid(row=5, column=2, sticky=tk.EW)
 
         # TIEMPO DE COCCION
-        ttk.Label(self.parent, text="Tiempo de Cocción:", padding=3).grid(row=5, column=4,sticky=tk.EW)
+        ttk.Label(self.parent, text="Tiempo Cocción (min):", padding=3).grid(row=5, column=4,sticky=tk.EW)
         ttk.Entry(self.parent, textvariable=self.cooking_time, justify= tk.RIGHT).grid(row=5, column=5, sticky=tk.EW)
 
         # Tags

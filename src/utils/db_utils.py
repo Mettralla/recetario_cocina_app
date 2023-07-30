@@ -17,7 +17,17 @@ class DBUtils:
 
 # INGREDIENTS CRUD -------------------------------------------------
 
-    def create_ingredient(self, ingredient_name) -> int:
+    def create_ingredient(self, ingredient_name: str) -> int:
+        """Creates a new ingredient in the database or retrieves the ID of an existing ingredient with the given name.
+
+        Parameters
+        -----------
+            ingredient_name (str): The name of the ingredient to be created or checked.
+
+        Returns
+        -------
+            int: The ID of the newly created ingredient or the ID of the existing ingredient with the given name.
+        """
         cursor = self.connection.cursor()
         try:
             existing_ingredient_id = self.check_record_existence(ingredient_name, 'ingredientes')
@@ -34,24 +44,30 @@ class DBUtils:
         finally:
             cursor.close()
     
-    def read_ingredients(self, ingredients_recipe_ids: int):
+    def read_ingredients(self, ingredients_recipe_ids: list[int]) -> list:
+        """Retrieves the details of ingredients used in a recipe based on the given list of recipe IDs.
+
+        Parameters
+        -----------
+            ingredients_recipe_ids (List[int]): A list of recipe IDs to fetch ingredient details.
+
+        Returns
+        -------
+            List[Tuple(str, float, str)]: A list of tuples, each containing the ingredient name, quantity, and measurement unit.
+        """
         cursor = self.connection.cursor()
-        print(f"read_ingredients - ingredient_ids: {ingredients_recipe_ids}")
         ingredients_data = []
         try:
             for id in ingredients_recipe_ids:
-                print(f"read_ingredients - id: {id}")
                 query = f"""SELECT ingredientes.nombre, ingredientes_receta.cantidad, ingredientes_receta.medida 
                         FROM ingredientes JOIN ingredientes_receta
                         ON ingredientes_receta.id_ingrediente = ingredientes.id_ingrediente
                         WHERE ingredientes_receta.id_ingredientes_receta = {id}"""
                 cursor.execute(query)
                 ingredient = cursor.fetchall()
-                print(f"read_ingredients - ingredient: {ingredient}")
                 ingredients_data.extend(ingredient)
             return ingredients_data
         finally:
-            print(f"read_ingredients - data: {ingredients_data}")
             cursor.close()
 
 # INGREDIENTS_RECIPE ---------------------------------
@@ -381,6 +397,8 @@ class DBUtils:
             self.connection.commit()
         finally:
             cursor.close()
+
+# SEARCH ----------------------------------------------------------
     
     def search_by_name(self, name):
         try:
@@ -403,7 +421,7 @@ class DBUtils:
             return found_recipes
         finally:
             cursor.close()
-            
+
     def search_by_tags(self, tags):
         try:
             cursor = self.connection.cursor()
@@ -423,8 +441,6 @@ class DBUtils:
             ON etiquetas_receta.id_etiqueta = etiquetas.id_etiqueta
             WHERE etiquetas.nombre = %s;
             """
-
-            # Ejecutar la consulta SQL pasando las etiquetas como parámetros
             cursor.execute(query, (tags,))
             found_recipes = cursor.fetchall()
             return set(found_recipes)
@@ -479,80 +495,74 @@ class DBUtils:
         finally:
             cursor.close()
 
-# TAG_RECIPE ----------------------------------}
+# RECIPE_OF_THE_DAY ----------------------------------
 
-    def select_recipe_of_the_day(self):
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute("SELECT id_receta FROM recetas")
-            all_recipes = cursor.fetchall()
+    # def select_recipe_of_the_day(self):
+    #     try:
+    #         cursor = self.connection.cursor()
+    #         cursor.execute("SELECT id_receta FROM recetas")
+    #         all_recipes = cursor.fetchall()
 
-            random_recipe = random.choice(all_recipes)
-            query_update = "UPDATE recetas SET receta_del_dia = 1, fecha_asignacion = %s WHERE id_receta = %s"
-            cursor.execute(query_update, (date.today(), random_recipe[0]))
-            self.connection.commit()
-        finally:
-            cursor.close()
+    #         random_recipe = random.choice(all_recipes)
+    #         query_update = "UPDATE recetas SET receta_del_dia = 1, fecha_asignacion = %s WHERE id_receta = %s"
+    #         cursor.execute(query_update, (date.today(), random_recipe[0]))
+    #         self.connection.commit()
+    #     finally:
+    #         cursor.close()
     
-    def get_recipe_of_the_day(self):
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute("""
-            SELECT r.id_receta, r.nombre, r.tiempo_preparacion, r.tiempo_coccion, r.creado_el,
-                   (SELECT GROUP_CONCAT(i.nombre SEPARATOR ', ')
-                    FROM ingredientes i
-                    JOIN ingredientes_receta ir ON i.id_ingrediente = ir.id_ingrediente
-                    WHERE ir.id_receta = r.id_receta
-                   ) AS ingredientes
-            FROM recetas r
-            WHERE receta_del_dia = 1
-        """)
-            recipe_of_the_day = cursor.fetchone()
-            return recipe_of_the_day
-        finally:
-            cursor.close()
+    # def get_recipe_of_the_day(self):
+    #     try:
+    #         cursor = self.connection.cursor()
+    #         cursor.execute("""
+    #         SELECT r.id_receta, r.nombre, r.tiempo_preparacion, r.tiempo_coccion, r.creado_el,
+    #                (SELECT GROUP_CONCAT(i.nombre SEPARATOR ', ')
+    #                 FROM ingredientes i
+    #                 JOIN ingredientes_receta ir ON i.id_ingrediente = ir.id_ingrediente
+    #                 WHERE ir.id_receta = r.id_receta
+    #                ) AS ingredientes
+    #         FROM recetas r
+    #         WHERE receta_del_dia = 1
+    #     """)
+    #         recipe_of_the_day = cursor.fetchone()
+    #         return recipe_of_the_day
+    #     finally:
+    #         cursor.close()
 
-    def reset_recipe_of_the_day(self):
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute("SELECT id_receta FROM recetas WHERE receta_del_dia = 1")
-            recipe_of_the_day = cursor.fetchone()
+    # def reset_recipe_of_the_day(self):
+    #     try:
+    #         cursor = self.connection.cursor()
+    #         cursor.execute("SELECT id_receta FROM recetas WHERE receta_del_dia = 1")
+    #         recipe_of_the_day = cursor.fetchone()
 
-            if recipe_of_the_day:
-                query_update = "UPDATE recetas SET receta_del_dia = 0, fecha_asignacion = NULL WHERE id_receta = %s"
-                cursor.execute(query_update, (recipe_of_the_day[0],))
-        finally:
-            cursor.close()
+    #         if recipe_of_the_day:
+    #             query_update = "UPDATE recetas SET receta_del_dia = 0, fecha_asignacion = NULL WHERE id_receta = %s"
+    #             cursor.execute(query_update, (recipe_of_the_day[0],))
+    #     finally:
+    #         cursor.close()
 
-    def has_day_changed(self):
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute("SELECT fecha_asignacion FROM recetas WHERE receta_del_dia = 1")
-            last_assignment_date = cursor.fetchone()
+    # def has_day_changed(self):
+    #     try:
+    #         cursor = self.connection.cursor()
+    #         cursor.execute("SELECT fecha_asignacion FROM recetas WHERE receta_del_dia = 1")
+    #         last_assignment_date = cursor.fetchone()
 
-            if last_assignment_date:
-                last_assignment_date = last_assignment_date[0]
-                current_date = date.today()
+    #         if last_assignment_date:
+    #             last_assignment_date = last_assignment_date[0]
+    #             current_date = date.today()
 
-                if current_date != last_assignment_date:
-                    return True
-                else:
-                    return False
-            else:
-                return True
+    #             if current_date != last_assignment_date:
+    #                 return True
+    #             else:
+    #                 return False
+    #         else:
+    #             return True
 
-        finally:
-            cursor.close()
-
+    #     finally:
+    #         cursor.close()
 
 
 if __name__ == "__main__":
     db = DBUtils()
     db.connect()
-    ing = db.read_ingredients([31, 32, 33])
+    ing = db.read_ingredients([1,2,4])
     print(ing)
-    for i in ing:
-        for f in i:
-            print(f)
-
-

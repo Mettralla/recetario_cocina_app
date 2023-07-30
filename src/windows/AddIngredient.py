@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from src.utils.db_utils import DBUtils
+from tkinter import messagebox as msg
 
 class AddIngredient(ttk.Frame):
     '''Clase que representa la ventana de agregar ingrediente individual'''
@@ -63,14 +64,17 @@ class AddIngredient(ttk.Frame):
             row=3, column=2, padx=5, columnspan=2, sticky=tk.EW)
 
     def add_ingredient(self):
-        new_ingredient = {
-            "nombre": self.ingrediente.get(),
-            "cantidad": self.cantidad.get(),
-            "medida": self.medida.get()
-        }
-        new_ingredient_id = self.db_utils.create_ingredient(new_ingredient['nombre'])
-        ingredient_value = self.db_utils.add_ingredient_to_recipe(new_ingredient_id, new_ingredient['cantidad'], new_ingredient['medida'])
-        self.close_window(ingredient_value, new_ingredient)
+        try:
+            new_ingredient = {
+                "nombre": self.ingrediente.get(),
+                "cantidad": self.cantidad.get(),
+                "medida": self.medida.get()
+            }
+            new_ingredient_id = self.db_utils.create_ingredient(new_ingredient['nombre'])
+            ingredient_value = self.db_utils.add_ingredient_to_recipe(new_ingredient_id, new_ingredient['cantidad'], new_ingredient['medida'])
+            self.close_window(ingredient_value, new_ingredient)
+        except Exception as e:
+            msg.showerror(message=f'Error: {e}', title='Nuevo Ingrediente', parent = self.parent)
 
     def close_window(self, ingredient_value, new_ingredient):
         self.recipe_instance.ingredient_value = ingredient_value

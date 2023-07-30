@@ -186,7 +186,7 @@ class NewRecipe(ttk.Frame, IBaseWindow):
             self.db_utils.add_prep_method_to_recipe(method_id, order, recipe_id)
 
     def save(self) -> None:
-        '''Toma los datos ingresados en la ventana y los almacena en csv_files'''
+        '''Toma los datos ingresados en la ventana y los almacena en la base de datos'''
         try:
             new_recipe = {
                 'name': self.name.get(),
