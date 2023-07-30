@@ -5,11 +5,14 @@ from src.windows.IBaseWindow import *
 from tkinter import filedialog as fd
 from tkinter import messagebox as msg
 import shutil
+from datetime import datetime
 
 class NewRecipe(ttk.Frame, IBaseWindow):
-    def __init__(self, parent, title: str) -> None:
+    def __init__(self, parent, title: str, recipe_instance) -> None:
         ttk.Frame.__init__(self, parent, padding=(20))
         IBaseWindow.__init__(self, parent, title)
+        
+        self.recipe_instance = recipe_instance
 
         self.name = tk.StringVar()
         self.preparation_time = tk.IntVar()
@@ -184,22 +187,37 @@ class NewRecipe(ttk.Frame, IBaseWindow):
 
     def save(self) -> None:
         '''Toma los datos ingresados en la ventana y los almacena en csv_files'''
-        new_recipe = {
-            'name': self.name.get(),
-            'prep_time': self.preparation_time.get(),
-            'cook_time': self.cooking_time.get(),
-            'image': self.get_source(self.image),
-            'favorite': self.get_fav(self.favorite.get()),
-        }
-        recipe_id = self.db_utils.create_recipe(new_recipe)
-        tag_ids = self.get_tags_id(self.tags.get())
-        self.recipe_tags(tag_ids, recipe_id)
-        self.recipe_ingredients(self.ingredients_temp, recipe_id)
-        self.recipe_prep_methods(self.prep_id_list, recipe_id)
+        try:
+            new_recipe = {
+                'name': self.name.get(),
+                'prep_time': self.preparation_time.get(),
+                'cook_time': self.cooking_time.get(),
+                'image': self.get_source(self.image),
+                'favorite': self.get_fav(self.favorite.get()),
+            }
+            recipe_id = self.db_utils.create_recipe(new_recipe)
+            tag_ids = self.get_tags_id(self.tags.get())
+            self.recipe_tags(tag_ids, recipe_id)
+            self.recipe_ingredients(self.ingredients_temp, recipe_id)
+            self.recipe_prep_methods(self.prep_id_list, recipe_id)
 
+            self.close_window(
+                {
+                    'id': recipe_id,
+                    'name': new_recipe['name'],
+                    'ingredients': self.tree_ing_data,
+                    'prep_time': new_recipe['prep_time'],
+                    'cook_time': new_recipe['cook_time'],
+                    'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                }
+            )
+        except Exception as e:
+            msg.showerror(message=f'Error: {e}', title='Nueva Receta', parent = self.parent)
+    
+    def close_window(self, new_data):
+        self.recipe_instance.added_row = new_data
+        self.recipe_instance.new_flag = True
         self.parent.destroy()
-        msg.showinfo(message='Receta creada, actualice la lista',
-        title='Receta agregada')
 
     def __del__(self):
         self.db_utils.disconnect()

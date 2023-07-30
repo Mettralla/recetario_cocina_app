@@ -16,6 +16,14 @@ class App(ttk.Frame):
         self.parent = parent
         self.search_option = tk.StringVar()
         self.search_input = tk.StringVar()
+        
+        self.edited_row = None
+        self.edit_flag = False
+        
+        self.added_row = None
+        self.new_flag = False
+        
+        self.treeview_content = []
 
         self.db_utils = DBUtils()
         self.db_utils.connect()
@@ -34,23 +42,20 @@ class App(ttk.Frame):
         # BUTTONS
         self.set_ui()
 
-        # DATA LIST
-
-        # GRID
         # COLUMNS
-        parent.columnconfigure(0, weight=4)
-        parent.columnconfigure(1, weight=1)
-        parent.columnconfigure(2, weight=1)
-        parent.columnconfigure(3, weight=1)
-        parent.columnconfigure(4, weight=1)
+        for i in range(5):
+            if i == 0:
+                parent.columnconfigure(i, weight=4)
+            else:
+                parent.columnconfigure(i, weight=1)
+
         # ROWS
-        parent.rowconfigure(0, weight=1)
-        parent.rowconfigure(1, weight=7)
-        parent.rowconfigure(2, weight=7)
-        parent.rowconfigure(3, weight=7)
-        parent.rowconfigure(4, weight=7)
-        parent.rowconfigure(5, weight=7)
-        
+        for i in range(6):
+            if i == 0:
+                parent.rowconfigure(i, weight=1)
+            else:
+                parent.rowconfigure(i, weight=7)
+
         self.tree = self.create_tree()
         self.read_data()
 
@@ -71,7 +76,7 @@ class App(ttk.Frame):
         ttk.Button(self.parent, text="Eliminar", command=self.delete_recipe).grid(
             row=4, column=0, padx=10, pady=5, sticky=(tk.NSEW))
         # ACTUALIZAR TREEVIEW
-        ttk.Button(self.parent, text="Actualizar", command=self.refresh_recipe_tree).grid(
+        ttk.Button(self.parent, text="Actualizar", command=self.recover_treeview_data).grid(
             row=5, column=0, padx=10, pady=5, sticky=(tk.NSEW))
         
         ttk.Combobox(self.parent, textvariable=self.search_option, 
@@ -80,7 +85,7 @@ class App(ttk.Frame):
             row=0, column=2, padx=5, pady=5, sticky=tk.NSEW)
         ttk.Button(self.parent, text="Buscar", command=self.search).grid(
             row=0, column=3, padx=10, pady=5, sticky=(tk.NSEW))
-        ttk.Button(self.parent, text="Reset", command=self.refresh_recipe_tree).grid(
+        ttk.Button(self.parent, text="Reset", command=self.recover_treeview_data).grid(
             row=0, column=4, padx=10, pady=5, sticky=(tk.NSEW))
 
     def create_tree(self) -> ttk.Treeview:
@@ -120,37 +125,56 @@ class App(ttk.Frame):
 
         return tree
 
-    # def read_data(self) -> None:
-    #     '''Lee el fichero csv e inserta los datos en el treeview'''
-    #     if self.new_day():
-    #         self.save_recipe_otd()
-    #     recipe_otd = self.get_recipe_otd()
-    #     recipe_otd_data = self.read_recipe_otd()
-    #     with open(RECIPE_LIST, newline="\n") as csvfile:
-    #         reader = csv.DictReader(csvfile)
-            # self.tree.insert('', tk.END, values=recipe_otd, tags="recipe_otd")
-            # self.tree.tag_configure("recipe_otd", foreground="white", background="black")
-
     def read_data(self):
-        recipe_list = self.db_utils.read_recipes()
-        for recipe in recipe_list:
+        self.recipe_list = self.db_utils.read_recipes()
+        for recipe in self.recipe_list:
             data = [recipe[0], recipe[1], recipe[5], f'{recipe[2]} min', f'{recipe[3]} min', recipe[4]]
             self.tree.insert('', tk.END, values= data)
 
     #CRUD
     def new_recipe(self) -> None:
         '''Abre una nueva ventana para agregar una receta'''
-        toplevel = tk.Toplevel(self.parent)
-        NewRecipe(toplevel, 'Agregar Receta').grid()
-        self.refresh_recipe_tree()
+        try:
+            toplevel = tk.Toplevel(self.parent)
+            new_recipe_window = NewRecipe(toplevel, 'Agregar Receta', self).grid()
+            toplevel.wait_window(new_recipe_window)
+            if self.new_flag:
+                ingredients = ''
+                for ingredient_details in self.added_row['ingredients']:
+                    ingredients += f'{ingredient_details[1]},'
+                new_value = (
+                    self.added_row['id'],
+                    self.added_row['name'],
+                    ingredients[:-1],
+                    f"{self.added_row['prep_time']} min",
+                    f"{self.added_row['cook_time']} min",
+                    self.added_row['created_at']
+                )
+                self.tree.insert('', tk.END, values=new_value)
+                self.new_flag = False
+        except Exception as e:
+            msg.showerror(message=f'Error: {e}', title='Nueva Receta', parent = self.parent)
 
     def edit_recipe(self) -> None:
         '''Abre una ventana para agregar una receta'''
         try:
-            id = self.get_recipe_id()
+            item = self.get_recipe_id()
+            id = item[0]
+            row = item[1]
             toplevel = tk.Toplevel(self.parent)
-            EditRecipe(toplevel, 'Editar Receta', id)
-            self.refresh_recipe_tree()
+            edit_window = EditRecipe(toplevel, 'Editar Receta', id, self).grid()
+            toplevel.wait_window(edit_window)
+            if self.edit_flag:
+                new_value = (
+                    id, 
+                    self.edited_row[0], 
+                    self.edited_row[1], 
+                    f'{self.edited_row[2]} min', 
+                    f'{self.edited_row[3]} min', 
+                    self.tree.item(row)['values'][5]
+                )
+                self.tree.item(row, values=new_value)
+                self.edit_flag = False
         except IndexError:
             msg.showerror(message='No ha seleccionado ningun item, haga click sobre un item y presione el boton.', title='Editar Receta', parent = self.parent)
 
@@ -158,7 +182,7 @@ class App(ttk.Frame):
         '''Elimina una receta del fichero csv'''
         try:
             select_item = self.get_recipe_id()
-            self.db_utils.delete_recipe(select_item)
+            self.db_utils.delete_recipe(select_item[0])
             self.refresh_recipe_tree()
             msg.showinfo(message='Receta eliminada con exito, actualice la lista', title='Eliminar Receta', parent = self.parent)
         except IndexError:
@@ -167,7 +191,8 @@ class App(ttk.Frame):
     def read_recipe(self) -> None:
         '''Abre una nueva ventana para leer una receta'''
         try: 
-            id = self.get_recipe_id()
+            item = self.get_recipe_id()
+            id = item[0]
             toplevel = tk.Toplevel(self.parent)
             ReadRecipe(toplevel, 'Leer Receta', id).grid()
         except IndexError:
@@ -176,13 +201,29 @@ class App(ttk.Frame):
 
     def refresh_recipe_tree(self) -> None:
         '''Actualiza la lista de recetas'''
+        self.tree.delete(*self.tree.get_children())
         self.tree = self.create_tree()
         self.read_data()
+
+    def recover_treeview_data(self):
+        if len(self.treeview_content) == 0:
+            msg.showinfo(
+                message='El recetario esta al dia', title='Recetas', parent=self.parent)
+        else:
+            self.tree.delete(*self.tree.get_children())
+            for recipe in self.treeview_content:
+                self.tree.insert('', tk.END, values=recipe)
+            self.treeview_content = []
+
+    def save_treeview(self):
+        for item in self.tree.get_children():
+            recipe = self.tree.item(item, "values")
+            self.treeview_content.append(recipe)
 
     def get_recipe_id(self) -> int:
         '''Guarda el id del item seleccionado al presionar un boton'''
         select_item = self.tree.focus()
-        return self.tree.item(select_item)['values'][0]
+        return self.tree.item(select_item)['values'][0], select_item
 
     def search(self) -> None:
         '''Recibe los datos ingresados en entry y lo redirige a la busqueda adecuada e inserta los valores en treeview.'''
@@ -205,7 +246,7 @@ class App(ttk.Frame):
             self.tree = self.create_tree()
             for recipe in recipes:
                 data = [recipe[0], recipe[1], recipe[5], f'{recipe[2]} min', f'{recipe[3]} min', recipe[4]]
-                self.tree.insert('', tk.END, values= data)
+                self.tree.insert('', tk.END, values=data)
         else:
             msg.showwarning(
                 title='Buscar', message='No se ha encontrado coincidencias', parent=self.parent)
@@ -214,6 +255,7 @@ class App(ttk.Frame):
         '''Busca las recetas por nombre.
             params:
                 (str) name: nombre buscado.'''
+        self.save_treeview()
         found_recipes = self.db_utils.search_by_name(name)
         self.read_search_data(found_recipes)
 
@@ -221,6 +263,7 @@ class App(ttk.Frame):
         '''Busca las recetas que tengan las etiquetas buscadas.
             params:
                 (str) tags: las etiquetas buscados separados por coma.'''
+        self.save_treeview()
         found_recipes  = self.db_utils.search_by_tags(tags)
         self.read_search_data(found_recipes)
 
@@ -228,6 +271,7 @@ class App(ttk.Frame):
         '''Busca las recetas que coincidan con el tiempo de preparacion deseado.
             params:
                 (str) prep_time: el tiempo de preparacion buscado.'''
+        self.save_treeview()
         found_recipes = self.db_utils.search_by_prep_time(prep_time)
         self.read_search_data(found_recipes)
 
@@ -235,6 +279,7 @@ class App(ttk.Frame):
         '''Busca las recetas que contengan los ingredientes ingresados.
             params:
                 (str) ingredients: los ingredientes buscados separados por coma.'''
+        self.save_treeview()
         found_recipes = self.db_utils.search_by_ingredient(ingredients)
         self.read_search_data(found_recipes)
 

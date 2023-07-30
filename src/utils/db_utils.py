@@ -4,13 +4,12 @@ import mysql.connector
 from datetime import date
 import random
 
-
 class DBUtils:
     def __init__(self):
         self.connection = None
 
     def connect(self):
-        self.connection = mysql.connector.connect(**DB_CONFIG)
+        self.connection = mysql.connector.connect(**DB_CONFIG, buffered=True)
 
     def disconnect(self):
         if self.connection:
@@ -171,8 +170,27 @@ class DBUtils:
                     FROM
                         recetas;"""
             cursor.execute(query)
-            result = cursor.fetchall()
-            return result
+            return cursor.fetchall()        
+        finally:
+            cursor.close()
+    
+    def get_edited_data_by_id(self, recipe_id):
+        try:
+            cursor = self.connection.cursor()
+            query = """
+                        SELECT recetas.id_receta, recetas.nombre, recetas.tiempo_preparacion, recetas.tiempo_coccion, recetas.creado_el,
+                        (
+                            SELECT GROUP_CONCAT(ingredientes.nombre SEPARATOR ',')
+                            FROM ingredientes
+                            JOIN ingredientes_receta
+                            ON ingredientes.id_ingrediente = ingredientes_receta.id_ingrediente
+                            WHERE ingredientes_receta.id_receta = recetas.id_receta
+                        ) AS ingredientes
+                        FROM
+                            recetas WHERE id_receta = %s;"""
+            value = (recipe_id,)
+            cursor.execute(query, value)
+            return cursor.fetchall()
         finally:
             cursor.close()
 
@@ -460,6 +478,7 @@ class DBUtils:
             return found_recipes
         finally:
             cursor.close()
+
 # TAG_RECIPE ----------------------------------}
 
     def select_recipe_of_the_day(self):
@@ -535,39 +554,5 @@ if __name__ == "__main__":
     for i in ing:
         for f in i:
             print(f)
-# USE recipe_manager;
 
-# -- SELECT * FROM recetas;
 
-# -- SELECT ingredientes
-
-# -- SELECT ingredientes.nombre, ingredientes_receta.cantidad, ingredientes_receta.medida 
-# -- FROM ingredientes
-# -- JOIN ingredientes_receta
-# -- ON ingredientes.id_ingrediente = ingredientes_receta.id_ingrediente
-# -- JOIN recetas
-# -- ON recetas.id_receta = ingredientes_receta.id_receta
-# -- WHERE recetas.id_receta = 3;
-
-# SELECT
-#     recetas.id_receta, recetas.nombre, recetas.tiempo_preparacion, 
-#     recetas.tiempo_coccion, recetas.imagen, recetas.favorito,
-#     (
-#         SELECT GROUP_CONCAT(ingredientes.nombre, ' (', ingredientes_receta.cantidad, ' ', ingredientes_receta.medida, ')' SEPARATOR ',')
-#         FROM ingredientes JOIN ingredientes_receta
-#         ON ingredientes.id_ingrediente = ingredientes_receta.id_ingrediente
-#         WHERE ingredientes_receta.id_receta = recetas.id_receta
-#     ) AS ingredientes,
-#     (
-# 		SELECT GROUP_CONCAT(pasos.descripcion SEPARATOR ',')
-#         FROM pasos JOIN pasos_receta
-#         ON pasos.id_paso = pasos_receta.id_paso
-#         WHERE pasos_receta.id_receta = recetas.id_receta
-# 	) AS pasos,
-#     (
-# 		SELECT GROUP_CONCAT(etiquetas.nombre SEPARATOR ',')
-#         FROM etiquetas JOIN etiquetas_receta
-#         ON etiquetas.id_etiqueta = etiquetas_receta.id_etiqueta
-#         WHERE etiquetas_receta.id_receta = recetas.id_receta
-#     ) AS etiquetas
-# FROM recetas;

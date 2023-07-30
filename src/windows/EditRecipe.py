@@ -9,7 +9,7 @@ import shutil
 import os
 
 class EditRecipe(ttk.Frame, IBaseWindow):
-    def __init__(self, parent, title: str, recipe_id: int) -> None:
+    def __init__(self, parent, title: str, recipe_id: int, recipe_instance) -> None:
         ttk.Frame.__init__(self, parent, padding=(20))
         IBaseWindow.__init__(self, parent, title)
 
@@ -17,6 +17,7 @@ class EditRecipe(ttk.Frame, IBaseWindow):
         self.db_utils.connect()
 
         self.id = recipe_id
+        self.recipe_instance = recipe_instance
         self.recipe = self.db_utils.get_recipe_by_id(recipe_id)
         self.recipe_original = self.recipe.copy()
         self.add_flag = False
@@ -209,5 +210,16 @@ class EditRecipe(ttk.Frame, IBaseWindow):
             'ingredients_id': self.ingredients_temp,
             'methods_id': self.prep_id_list
         }
+
         self.db_utils.check_and_update(edited_recipe, self.recipe_original)
+        self.close_window([
+            updated_values['nombre'],
+            edited_recipe['ingredientes'],
+            updated_values['tiempo de preparacion'],
+            updated_values['tiempo de coccion'],
+        ])
+        
+    def close_window(self, edit_data):
+        self.recipe_instance.edited_row = edit_data
+        self.recipe_instance.edit_flag = True
         self.parent.destroy()

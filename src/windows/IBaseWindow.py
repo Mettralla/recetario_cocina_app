@@ -14,11 +14,11 @@ class IBaseWindow(ABC):
         
         self.db_utils = DBUtils()
         self.db_utils.connect()
-        
+
         # COLUMNS
         for i in range(7):
             self.parent.columnconfigure(i, weight=1)
-        
+
         for i in range(8):
             if i != 2 and i != 4:
                 self.parent.rowconfigure(i, weight=1)

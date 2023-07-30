@@ -3,6 +3,6 @@
 DB_CONFIG = {
     'host': '127.0.0.1',
     'user': 'user',
-    'password': 'password',
+    'password': 'pass',
     'database': 'recipe_manager'
 }
