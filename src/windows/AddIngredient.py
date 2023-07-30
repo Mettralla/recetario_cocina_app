@@ -4,7 +4,36 @@ from src.utils.db_utils import DBUtils
 from tkinter import messagebox as msg
 
 class AddIngredient(ttk.Frame):
-    '''Clase que representa la ventana de agregar ingrediente individual'''
+    """Class representing the window for adding individual ingredients.
+
+    This class creates a window to add a new ingredient to the current recipe.
+    It provides a user interface to enter the name, quantity, and measurement of the ingredient.
+    Upon adding the ingredient, it connects to the database via the 'db_utils' object,
+    and associates the ingredient with the current recipe using the 'add_ingredient_to_recipe' method.
+    The class also handles window closure and updates the parent recipe instance with the data of the new ingredient.
+
+    Attributes
+    ----------
+        parent (Tk): The main window where the add ingredient window will be displayed.
+        recipe_instance (Recipe): The instance of the current recipe being edited.
+
+    Methods
+    -------
+        __init__(self, parent, recipe_instance): Constructor of the class.
+        add_ingredient(self): Adds a new ingredient to the current recipe.
+        close_window(self, ingredient_value, new_ingredient): Closes the window and updates the parent recipe instance.
+        __del__(self): Destructor of the class that disconnects from the 'db_utils' object.
+
+    Attributes
+    ----------
+        self.parent (Tk): The main window where the add ingredient window will be displayed.
+        self.recipe_instance (Recipe): The instance of the current recipe being edited.
+        self.db_utils (DBUtils): An object handling the connection and queries to the database.
+        self.ingrediente (tk.StringVar): Control variable for the name of the ingredient.
+        self.cantidad (tk.IntVar): Control variable for the quantity of the ingredient.
+        self.medida (tk.StringVar): Control variable for the measurement of the ingredient.
+        self.medidas (list): List of measurement options for the ingredient.
+    """
     def __init__(self, parent, recipe_instance) -> None:
         super().__init__(parent, padding=(20))
         self.parent = parent
@@ -88,7 +117,7 @@ class AddIngredient(ttk.Frame):
         except Exception as e:
             msg.showerror(message=f'Error: {e}', title='Nuevo Ingrediente', parent = self.parent)
 
-    def close_window(self, ingredient_value, new_ingredient):
+    def close_window(self, ingredient_value: int, new_ingredient: dict) -> None:
         """Close the ingredient window and update the parent recipe instance.
 
         This method is called after successfully adding an ingredient to the recipe.
@@ -108,7 +137,7 @@ class AddIngredient(ttk.Frame):
         self.recipe_instance.add_flag = True
         self.parent.destroy()
 
-    def __del__(self):
+    def __del__(self) -> None:
         """Disconnect from the database when the instance is deleted.
 
         This method is called automatically when the instance is being deleted or garbage-collected.
