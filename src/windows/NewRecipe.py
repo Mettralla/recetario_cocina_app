@@ -213,7 +213,7 @@ class NewRecipe(ttk.Frame, IBaseWindow):
             )
         except Exception as e:
             msg.showerror(message=f'Error: {e}', title='Nueva Receta', parent = self.parent)
-    
+
     def close_window(self, new_data):
         self.recipe_instance.added_row = new_data
         self.recipe_instance.new_flag = True

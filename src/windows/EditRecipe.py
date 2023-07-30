@@ -193,31 +193,34 @@ class EditRecipe(ttk.Frame, IBaseWindow):
 
     def save(self) -> None:
         '''Toma los datos ingresados en la ventana y los almacena en csv_files'''
-        updated_values = {
-            'id': self.id,
-            'nombre': self.name.get(),
-            'tiempo de preparacion': self.preparation_time.get(),
-            'tiempo de coccion': self.cooking_time.get(),
-            'imagen': self.recipe['imagen'],
-            'favorito': 1 if self.favorite.get() == 'Si' else 0
-        }
-        self.db_utils.update_recipe(updated_values)
-        edited_recipe = {
-            'ingredientes': self.recipe['ingredientes'],
-            'cantidades': self.recipe['cantidades'],
-            'preparacion': self.recipe['preparacion'],
-            'etiquetas': self.tags.get(),
-            'ingredients_id': self.ingredients_temp,
-            'methods_id': self.prep_id_list
-        }
+        try:
+            updated_values = {
+                'id': self.id,
+                'nombre': self.name.get(),
+                'tiempo de preparacion': self.preparation_time.get(),
+                'tiempo de coccion': self.cooking_time.get(),
+                'imagen': self.recipe['imagen'],
+                'favorito': 1 if self.favorite.get() == 'Si' else 0
+            }
+            self.db_utils.update_recipe(updated_values)
+            edited_recipe = {
+                'ingredientes': self.recipe['ingredientes'],
+                'cantidades': self.recipe['cantidades'],
+                'preparacion': self.recipe['preparacion'],
+                'etiquetas': self.tags.get(),
+                'ingredients_id': self.ingredients_temp,
+                'methods_id': self.prep_id_list
+            }
 
-        self.db_utils.check_and_update(edited_recipe, self.recipe_original)
-        self.close_window([
-            updated_values['nombre'],
-            edited_recipe['ingredientes'],
-            updated_values['tiempo de preparacion'],
-            updated_values['tiempo de coccion'],
-        ])
+            self.db_utils.check_and_update(edited_recipe, self.recipe_original)
+            self.close_window([
+                updated_values['nombre'],
+                edited_recipe['ingredientes'],
+                updated_values['tiempo de preparacion'],
+                updated_values['tiempo de coccion'],
+            ])
+        except Exception as e:
+            msg.showerror(message=f'Error: {e}', title='Editar Receta', parent = self.parent)
         
     def close_window(self, edit_data):
         self.recipe_instance.edited_row = edit_data
