@@ -4,6 +4,25 @@ import tkinter as tk
 from tkinter import ttk
 
 class IBaseWindow(ABC):
+    """Abstract Base Class for creating a basic window with common configurations.
+
+    This class defines a common set of methods and attributes for creating a basic window with common configurations.
+    It serves as a base class for creating specific windows with customized user interfaces and functionalities.
+
+    Parameters
+    ----------
+        parent (tk.Tk or tk.Toplevel): The parent window to which this window is associated.
+        title (str): The title of the window.
+
+    Attributes
+    ----------
+        parent (tk.Tk or tk.Toplevel): The parent window to which this window is associated.
+        db_utils (DBUtils): An instance of the DBUtils class for database-related operations.
+
+    Note
+    ----
+        Subclasses of this class must implement the `create_ui` method to create the specific user interface for the window.
+    """
     def __init__(self, parent, title) -> None:
         super().__init__()
         self.parent = parent
@@ -27,9 +46,21 @@ class IBaseWindow(ABC):
 
     @abstractmethod
     def create_ui(self):
+        """Abstract method to create the user interface for the specific window.
+
+        Subclasses must implement this method to create the customized user interface for the window.
+        """
         pass
     
-    def base_ui_config(self, btn_title):
+    def base_ui_config(self, btn_title: str) -> None:
+        """Configure the base user interface elements for the recipe editor window.
+
+        This method sets up the base user interface elements, such as labels, buttons, and entry fields, for the recipe editor window. It organizes the layout using the grid manager to create a structured display.
+
+        Parameters
+        ----------
+            btn_title (str): The title to be displayed on the primary action button. Typically, it will be either 'Guardar' (Save) for adding a new recipe or 'Actualizar' (Update) for editing an existing recipe.
+        """
         # NOMBRE DE LA RECETA
         ttk.Label(self.parent, text="Nombre:", padding=3).grid(row=0, column=1, sticky=tk.EW)
         ttk.Entry(self.parent, textvariable=self.name, justify=tk.RIGHT).grid(row=0, column=2, columnspan=4, sticky=tk.EW)
@@ -75,6 +106,25 @@ class IBaseWindow(ABC):
         ttk.Button(self.parent, text="Cancelar", command=self.parent.destroy).grid(row=8, column=3, columnspan=3, sticky=tk.NSEW, padx=5, pady=5)
 
     def create_treeview(self, tree_row, tree_column, option, columns_value) -> ttk.Treeview:
+        """Create and configure a Treeview widget.
+
+        This method creates a new instance of a Treeview widget and configures its appearance and behavior based on theprovided parameters.
+
+        Parameters
+        ----------
+            tree_row (int): The row in the grid where the Treeview should be placed.
+            tree_column (int): The column in the grid where the Treeview should be placed.
+            option (int): The option to choose the Treeview's layout. If 1, it configures the Treeview for displaying ingredient information. Otherwise, it configures it for displaying preparation methods.
+            columns_value (tuple): A tuple containing the column names to be displayed in the Treeview headings.
+
+        Returns
+        -------
+            ttk.Treeview: The configured Treeview widget.
+
+        Note
+        ----
+            When `option` is 1, the Treeview is configured for displaying ingredient information with columns 'Cantidad' and 'Ingredientes'. When `option` is not 1, the Treeview is configured for displaying preparation methods with columns 'Id' and 'Pasos'.
+        """
         tree = ttk.Treeview(self.parent, columns=columns_value, show='headings',  height=5)
 
         tree.grid(row=tree_row, column=tree_column, sticky=(tk.NSEW), padx=5, columnspan=5 )
