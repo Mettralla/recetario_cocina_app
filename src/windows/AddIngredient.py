@@ -64,6 +64,18 @@ class AddIngredient(ttk.Frame):
             row=3, column=2, padx=5, columnspan=2, sticky=tk.EW)
 
     def add_ingredient(self):
+        """Add a new ingredient to the recipe.
+
+        This method takes the input values for a new ingredient (name, quantity, and unit of measurement),
+        creates the ingredient in the database using the 'create_ingredient' method from 'db_utils',
+        and then associates the ingredient with the current recipe using the 'add_ingredient_to_recipe' method.
+        Finally, it closes the current window and updates the parent recipe instance with the new ingredient data.
+
+        If an error occurs during the process, an error message will be displayed in a pop-up window.
+
+        Raises:
+            Exception: If any error occurs during the ingredient creation or association process.
+        """
         try:
             new_ingredient = {
                 "nombre": self.ingrediente.get(),
@@ -77,10 +89,29 @@ class AddIngredient(ttk.Frame):
             msg.showerror(message=f'Error: {e}', title='Nuevo Ingrediente', parent = self.parent)
 
     def close_window(self, ingredient_value, new_ingredient):
+        """Close the ingredient window and update the parent recipe instance.
+
+        This method is called after successfully adding an ingredient to the recipe.
+        It updates the parent recipe instance with the ingredient's database ID (ingredient_value),
+        the formatted ingredient data (data_ing), and sets the 'add_flag' to True to indicate a new ingredient was added.
+        Finally, it closes the current window.
+
+        Parameters:
+            ingredient_value (int): The ID of the newly created ingredient in the database.
+            new_ingredient (dict): A dictionary containing the details of the new ingredient.
+
+        Note:
+            The 'recipe_instance' and 'parent' attributes are assumed to be available in the current instance.
+        """
         self.recipe_instance.ingredient_value = ingredient_value
         self.recipe_instance.data_ing = (str(new_ingredient['cantidad']) + ' ' + new_ingredient['medida'], new_ingredient['nombre'])
         self.recipe_instance.add_flag = True
         self.parent.destroy()
 
     def __del__(self):
+        """Disconnect from the database when the instance is deleted.
+
+        This method is called automatically when the instance is being deleted or garbage-collected.
+        It ensures that the 'db_utils' object disconnects from the database to free up resources.
+        """
         self.db_utils.disconnect()
