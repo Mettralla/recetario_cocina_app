@@ -407,6 +407,8 @@ class App(ttk.Frame):
         ----------
             name (str): The name of the recipe to search for.
         """
+        self.db_utils.disconnect()
+        self.db_utils.connect()
         self.save_treeview()
         found_recipes = self.db_utils.search_by_name(name)
         self.read_search_data(found_recipes)
@@ -422,6 +424,8 @@ class App(ttk.Frame):
         ----------
             tags (str): The tags to search for.
         """
+        self.db_utils.disconnect()
+        self.db_utils.connect()
         self.save_treeview()
         found_recipes  = self.db_utils.search_by_tags(tags)
         self.read_search_data(found_recipes)
@@ -439,6 +443,8 @@ class App(ttk.Frame):
             prep_time (str): The preparation time to search for. It should be a string
             representing the preparation time in minutes.
         """
+        self.db_utils.disconnect()
+        self.db_utils.connect()
         self.save_treeview()
         found_recipes = self.db_utils.search_by_prep_time(prep_time)
         self.read_search_data(found_recipes)
@@ -455,6 +461,8 @@ class App(ttk.Frame):
         ----------
             ingredients (str): The ingredients to search for.
         """
+        self.db_utils.disconnect()
+        self.db_utils.connect()
         self.save_treeview()
         found_recipes = self.db_utils.search_by_ingredient(ingredients)
         self.read_search_data(found_recipes)

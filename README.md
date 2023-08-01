@@ -17,6 +17,7 @@ En un principio se administraba a traves de CSV pero se migro a una base de dato
 - [Consigna](#problem_statement)
 - [Resolucion](#idea)
 - [Instalación/Ejecucion](#getting_started)
+- [Demo](#demo)
 - [Vista Previa](#usage)
 - [Tecnologias](#tech_stack)
 - [Autor](#authors)
@@ -92,6 +93,7 @@ Estructura del proyecto:
     │       ├── db_config.py                    # Credenciales 
     │       ├── db_migrate.py                   # Migracion 
     │       └── db_utils.py                     # Controlador
+    ├── screenshots                         # App screenshots 
     ├── .gitignore                            
     ├── main.py                         # Ventana principal
     ├── constant.py                     # Enrutador
@@ -109,7 +111,7 @@ python -m venv env
 Activar entorno
 
 ```bash
-source env\Scripts\activate
+source env/Scripts/activate
 ```
 
 Clonar el repositorio
@@ -153,28 +155,32 @@ Iniciar programa
 python main.py
 ```
 
+## 🎞 Demo <a name="demo"></a>
+
+[Haz clic aquí para ver el video](https://youtu.be/a5Uhj2D3Kw4)
+
 ## 🎈 Vista Previa <a name="usage"></a>
 
 
 - Ventana Principal
 
-<!-- ![App Screenshot](https://drive.google.com/uc?export=view&id=1EQMfyEnTBAVv_2S9p819i3daVu2uNfUT) -->
+![App Screenshot](./screenshots/main.png)
 <br>
 
 - Ventana Agregar Receta
 <br>
 
-<!-- ![App Screenshot](https://drive.google.com/uc?export=view&id=1lPLi8Iu2l4V33RcDV900WpURVBbzx3JS) -->
+![App Screenshot](./screenshots/new.png)
 
 - Ventana Editar Receta
 <br>
 
-<!-- ![App Screenshot](https://drive.google.com/uc?export=view&id=1HeO9ecogyfXjUoVZsd8tpEZt8MGsmBGE) -->
+![App Screenshot](./screenshots/edit.png)
 
 - Ventana Ver Receta
 <br>
 
-<!-- ![App Screenshot](https://drive.google.com/uc?export=view&id=1BkQi30wDJ-kj1drPEkVBkZl206x4LflN) -->
+![App Screenshot](./screenshots/read.png)
 
 ## ⛏️ Tecnologias <a name = "tech_stack"></a>
 
