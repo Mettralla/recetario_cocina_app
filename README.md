@@ -102,10 +102,28 @@ Clonar el repositorio
 git clone git@github.com:Mettralla/recetario_cocina_app.git
 ```
 
+Crear entorno virtual
+
+```bash
+python -m venv env
+```
+
+Activar entorno
+
+```bash
+source env/Scripts/activate
+```
+
 Ir al directorio del proyecto
 
 ```bash
 cd recetario_cocina_app
+```
+
+Instalar dependencias
+
+```bash
+pip install -r requirements.txt
 ```
 
 Iniciar programa
