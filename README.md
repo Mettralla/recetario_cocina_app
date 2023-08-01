@@ -5,11 +5,10 @@
 
 ---
 
-<p align="center"> Resolucion del Proyecto Integrador Final de la Catedra Programación 1 de la Carrera de Desarrollo de Software de la Universidad Provincial de Administración, Tecnologia y Oficios (UPATECO). Consiste en una aplicacion de escritorio donde puede almacenarse recetas de cocina. 
-En un principio se administraba a traves de CSV pero se migro a una base de datos MYSQL durante el cursado de Programacion 2. 
-<br> 
+Este repositorio contiene la resolucion del Proyecto Integrador Final de la Catedra Programación 1 de la Carrera de Desarrollo de Software de la Universidad Provincial de Administración, Tecnologia y Oficios (UPATECO). Esta consiste en una aplicacion de escritorio donde podia almacenarse recetas de cocina usando archivos csv como base de datos. Sin embargo, durante el cursado de Programación 2 se migro de ficheros csv hacia la implementacion de una base de datos MySQL actual. 
 
-</p>
+Si estás interesado en ver cómo funcionaba la versión antigua de la aplicación utilizando el archivo CSV, puedes acceder a la rama "legacy" haciendo clic en el siguiente enlace: [Ver la versión con ficheros CSV](https://github.com/Mettralla/recetario_cocina_app/tree/legacy_v1_csv)
+
 
 ---
 
@@ -52,7 +51,6 @@ Las funcionalidades que debe tener la aplicación son las siguientes:
     - Crear una receta. ✅
     - Modificar una receta. ✅
     - Eliminar una receta. ✅
-    - Mostrar “receta del día” aleatoria en la ventana principal. ⭐
     - Buscar y/o filtrar recetas:
         ¬ Nombre. ⭐
         ¬ Por etiquetas. ⭐
@@ -63,7 +61,6 @@ Debe contar con las siguientes vistas:
 
     - Recetario. Ventana principal por defecto.
     - Se muestra un listado de todas las recetas. ✅
-    - Se mostrará como primera receta de lista a la “receta del día”, la cual debe tener un formato distinto a las demás recetas. ⭐
     - Muestra una receta ya existente. ✅
     - Carga/modificación de una receta. ✅
     - Búsqueda y filtro. La ventana deberá tener un campo de búsqueda, por nombre y/o etiqueta. Una vez filtrados las recetas, se las mostrará en una lista.⭐
@@ -187,6 +184,7 @@ python main.py
 - [Python 3.10.0](https://www.python.org) - Lenguaje
 - Librerias usadas:
     - [Tkinter](https://docs.python.org/es/3/library/tkinter.html) - Interface de Python para Tcl/Tk
+    - Pillow
     - MySQL
 
 ## ✍️ Autor <a name = "authors"></a>
